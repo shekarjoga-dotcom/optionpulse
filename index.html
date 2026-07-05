@@ -1604,6 +1604,10 @@ http.createServer((req, res) =&gt; {
             </div>
           </div>
           <div class="button-row" style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" id="btLoadDefaultDbBtn" style="background:#818cf8; border-color:#818cf8; color:#fff; display:inline-flex; align-items:center; gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>
+              Load Default Nifty Master
+            </button>
             <button class="btn btn-outline btn-sm" id="btSyncCacheBtn" style="background:#0284c7; border-color:#0284c7; color:#fff; display:inline-flex; align-items:center; gap:6px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
               Sync Latest to Today
@@ -4863,6 +4867,38 @@ http.createServer((req, res) =&gt; {
       const statusEl = document.getElementById('btUploadStatus');
       statusEl.className = 'fetch-status idle';
       statusEl.textContent = 'Cache cleared. No files loaded';
+    }
+  });
+
+  document.getElementById('btLoadDefaultDbBtn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('btUploadStatus');
+    statusEl.className = 'fetch-status loading';
+    statusEl.textContent = 'Downloading default Nifty master database...';
+    try {
+      const res = await fetch('nifty_master.json');
+      if (!res.ok) throw new Error('Default database file nifty_master.json not found on server.');
+      const data = await res.json();
+      
+      await setCachedCandles(data);
+      lastFetchedBacktestCandles = data;
+      
+      const { dateStr: firstDate } = toISTParts(data.timestamp[0]);
+      const { dateStr: lastDate } = toISTParts(data.timestamp[data.timestamp.length - 1]);
+      
+      lastFetchedBacktestMetadata = {
+        source: 'uploaded',
+        symbol: 'nifty_master',
+        fromDate: firstDate,
+        toDate: lastDate,
+        interval: 'merged'
+      };
+
+      statusEl.className = 'fetch-status ok';
+      statusEl.textContent = `Loaded default database: ${data.timestamp.length} candles (${firstDate} to ${lastDate}). Ready to simulate!`;
+      alert('Success: Loaded default Nifty master database into local browser cache!');
+    } catch (err) {
+      statusEl.className = 'fetch-status err';
+      statusEl.textContent = `Load Error: ${err.message}. Place nifty_master.json in your hosting root folder.`;
     }
   });
 
