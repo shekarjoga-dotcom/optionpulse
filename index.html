@@ -2901,7 +2901,7 @@ http.createServer((req, res) =&gt; {
 
   async function dhanRequest(path, body) {
     const { token, clientId, proxy } = getDhanCreds();
-    if (!token || !clientId) {
+    if (!proxy && (!token || !clientId)) {
       throw new Error('Enter your Dhan Access Token and Client ID in the "Live Data" section above first.');
     }
     const base = proxy ? proxy.replace(/\/$/, '') : 'https://api.dhan.co';
@@ -2909,7 +2909,7 @@ http.createServer((req, res) =&gt; {
     try {
       res = await fetch(base + path, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'access-token': token, 'client-id': clientId },
+        headers: { 'Content-Type': 'application/json', 'access-token': token || '', 'client-id': clientId || '' },
         body: JSON.stringify(body || {})
       });
     } catch (e) {
