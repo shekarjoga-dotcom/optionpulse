@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OptionPulse | Systematic Intraday Options Analytics</title>
 <script defer src="/_vercel/insights/script.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
 <link href="./Rules-Based Intraday Options Strategy _ CA Nitin Murarka_files/css2" rel="stylesheet">
@@ -1487,6 +1488,49 @@ http.createServer((req, res) =&gt; {
       </div>
       <div id="tgStatusMsg" class="fetch-status idle" style="margin-top:12px;"></div>
     </div>
+
+    <!-- EMAIL ALERTS INTEGRATION -->
+    <div class="tool-card" style="margin-top:20px;">
+      <h3 style="font-size:1rem; color:var(--text); margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        Email Alerts (EmailJS)
+      </h3>
+      <p class="hint" style="margin-bottom:12px;">Receive trade executions and checklist alerts directly in your inbox. Sign up for a free <a href="https://www.emailjs.com/" target="_blank" style="color:var(--accent);">EmailJS account</a> (200 free emails/month) and copy your credentials below.</p>
+      
+      <div class="tool-grid-3">
+        <div class="tool-field">
+          <label>Recipient Email Address</label>
+          <input type="email" id="emailAlertRecipient" placeholder="owner@domain.com">
+        </div>
+        <div class="tool-field">
+          <label>EmailJS Service ID</label>
+          <input type="text" id="emailjsServiceId" placeholder="e.g. service_xxxx">
+        </div>
+        <div class="tool-field">
+          <label>EmailJS Template ID</label>
+          <input type="text" id="emailjsTemplateId" placeholder="e.g. template_xxxx">
+        </div>
+        <div class="tool-field">
+          <label>EmailJS Public Key</label>
+          <input type="password" id="emailjsPublicKey" placeholder="e.g. user_xxxx or pk_xxxx">
+        </div>
+        <div class="tool-field" style="display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap; margin-top:8px;">
+          <label style="display:inline-flex; align-items:center; gap:6px; font-size:.85rem; cursor:pointer; margin-bottom:10px;">
+            <input type="checkbox" id="emailAlertChecklist" checked style="width:15px; height:15px; cursor:pointer;"> Send Checklist Alerts
+          </label>
+          <label style="display:inline-flex; align-items:center; gap:6px; font-size:.85rem; cursor:pointer; margin-bottom:10px;">
+            <input type="checkbox" id="emailAlertPaper" checked style="width:15px; height:15px; cursor:pointer;"> Send Trading Alerts
+          </label>
+        </div>
+      </div>
+
+      <div class="button-row" style="margin-top:16px;">
+        <button class="btn btn-primary" id="emailSaveBtn">Save Email Settings</button>
+        <button class="btn btn-outline" id="emailTestBtn" style="margin-left:10px;">Test Email Alert</button>
+        <button class="btn btn-outline" id="emailClearBtn" style="margin-left:10px; border-color:var(--red); color:var(--red);">Clear</button>
+      </div>
+      <div id="emailStatusMsg" class="fetch-status idle" style="margin-top:12px;"></div>
+    </div>
   </section>
 
   <!-- BACKTESTER -->
@@ -1873,11 +1917,14 @@ http.createServer((req, res) =&gt; {
     <div class="tool-panel">
       <h3>Systematic Entry Checklist Dashboard</h3>
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:12px; align-items:center;">
           <button class="btn btn-ghost btn-sm" id="cockpitFetchLive">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>
             Fetch Live Status
           </button>
+          <label style="display:inline-flex; align-items:center; gap:6px; font-size:.8rem; color:var(--text-dim); cursor:pointer; user-select:none;">
+            <input type="checkbox" id="cockpitAutoSync" style="width:13px; height:13px; cursor:pointer;"> Auto-Monitor Rules
+          </label>
         </div>
         <div id="cockpitMarketTime" style="font-family:'JetBrains Mono', monospace; font-size:.9rem; color:var(--text-dim);">Market Time: —</div>
       </div>
@@ -3857,6 +3904,9 @@ http.createServer((req, res) =&gt; {
   const cockpitAlertBox = document.getElementById('cockpitAlertBox');
   const cockpitMarketTime = document.getElementById('cockpitMarketTime');
 
+  let lastCockpitAlertState = false;
+  let lastCockpitAlertContract = '';
+
   function evaluateCockpitRules() {
     const now = new Date();
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
@@ -3908,6 +3958,8 @@ http.createServer((req, res) =&gt; {
 
     const pcr = parseFloat(cockpitPcr.value) || 1.0;
     const optType = cockpitOptType.value;
+    const strike = parseFloat(cockpitStrike.value) || 0;
+    const preset = cockpitPreset.value;
     let isPcrOk = false;
     
     if (optType === 'CE') {
@@ -3948,18 +4000,28 @@ http.createServer((req, res) =&gt; {
       cockpitAlertBox.className = "strike-result sweet";
       cockpitAlertBox.innerHTML = `🚀 SYSTEM ENTRY TRIGGER MET: BUY ${optType}!
         <span class="detail">All core rules align: Time is after 11:00 AM (${clockStr}), Option Premium (₹${ltp.toFixed(1)}) is at fair VWAP value (₹${vwap.toFixed(1)}), and market PCR (${pcr.toFixed(2)}) confirms institutional momentum. Trade with strict Stop Loss!</span>`;
-    } else if (isVwapOk && isPcrOk && !isAfter11) {
-      cockpitAlertBox.className = "strike-result warn";
-      cockpitAlertBox.innerHTML = `⏳ PRE-MARKET SETUP ALIGNED — WAIT FOR TIME RULE
-        <span class="detail">PCR and VWAP pullback conditions are met, but you must wait until 11:00 AM IST to allow market open interest inventory to build fully. Do not front-run!</span>`;
-    } else if (isAfter11 && isPcrOk && !isVwapOk) {
-      cockpitAlertBox.className = "strike-result warn";
-      cockpitAlertBox.innerHTML = `⚠️ WAITING FOR VWAP PULLBACK — DO NOT CHASE
-        <span class="detail">Market direction is confirmed by PCR (${pcr.toFixed(2)}), but the premium (₹${ltp.toFixed(1)}) is trading above its institutional VWAP (₹${vwap.toFixed(1)}). Wait for a pullback to touch VWAP before entering.</span>`;
+      
+      const currentContractKey = `${preset}_${strike}_${optType}`;
+      if (!lastCockpitAlertState || lastCockpitAlertContract !== currentContractKey) {
+        lastCockpitAlertState = true;
+        lastCockpitAlertContract = currentContractKey;
+        sendTelegramAlert(`🚀 *OptionPulse Entry Trigger Met*\n*Action*: BUY ${optType}\n*Asset*: ${preset.toUpperCase()} Strike ${strike}\n*Option Premium*: ₹${ltp.toFixed(1)} (VWAP: ₹${vwap.toFixed(1)})\n*Market PCR*: ${pcr.toFixed(2)}\n*Market Time*: ${clockStr}\nReady to execute on your dashboard!`, false, 'checklist');
+      }
     } else {
-      cockpitAlertBox.className = "strike-result bad";
-      cockpitAlertBox.innerHTML = `❌ SYSTEM DISCIPLINE: NO TRADE ENTRY
-        <span class="detail">One or more checklist conditions have failed. Remember the core rule: we do not trade on gut feelings or chase market momentum. Wait for the system to align.</span>`;
+      lastCockpitAlertState = false;
+      if (isVwapOk && isPcrOk && !isAfter11) {
+        cockpitAlertBox.className = "strike-result warn";
+        cockpitAlertBox.innerHTML = `⏳ PRE-MARKET SETUP ALIGNED — WAIT FOR TIME RULE
+          <span class="detail">PCR and VWAP pullback conditions are met, but you must wait until 11:00 AM IST to allow market open interest inventory to build fully. Do not front-run!</span>`;
+      } else if (isAfter11 && isPcrOk && !isVwapOk) {
+        cockpitAlertBox.className = "strike-result warn";
+        cockpitAlertBox.innerHTML = `⚠️ WAITING FOR VWAP PULLBACK — DO NOT CHASE
+          <span class="detail">Market direction is confirmed by PCR (${pcr.toFixed(2)}), but the premium (₹${ltp.toFixed(1)}) is trading above its institutional VWAP (₹${vwap.toFixed(1)}). Wait for a pullback to touch VWAP before entering.</span>`;
+      } else {
+        cockpitAlertBox.className = "strike-result bad";
+        cockpitAlertBox.innerHTML = `❌ SYSTEM DISCIPLINE: NO TRADE ENTRY
+          <span class="detail">One or more checklist conditions have failed. Remember the core rule: we do not trade on gut feelings or chase market momentum. Wait for the system to align.</span>`;
+      }
     }
   }
 
@@ -4974,11 +5036,51 @@ http.createServer((req, res) =&gt; {
 
   loadCachedDatabase();
 
-  // TELEGRAM BOT INTEGRATION LOGIC
+  // EMAIL ALERTS LOGIC (EMAILJS)
+  async function sendEmailAlert(subject, text, force = false, alertType = 'checklist') {
+    const recipient = localStorage.getItem('email_alert_recipient') || '';
+    const serviceId = localStorage.getItem('emailjs_service_id') || '';
+    const templateId = localStorage.getItem('emailjs_template_id') || '';
+    const publicKey = localStorage.getItem('emailjs_public_key') || '';
+    const chkChecklist = localStorage.getItem('email_alert_checklist') !== '0';
+    const chkPaper = localStorage.getItem('email_alert_paper') !== '0';
+
+    if (!recipient || !serviceId || !templateId || !publicKey) return false;
+
+    if (!force) {
+      if (alertType === 'checklist' && !chkChecklist) return false;
+      if (alertType === 'paper' && !chkPaper) return false;
+    }
+
+    try {
+      emailjs.init(publicKey);
+      const cleanMessage = text.replace(/[\*_]+/g, '');
+      const resp = await emailjs.send(serviceId, templateId, {
+        to_email: recipient,
+        subject: `OptionPulse Alert: ${subject}`,
+        message: cleanMessage
+      });
+      return resp.status === 200;
+    } catch (err) {
+      console.error('EmailJS send failed:', err);
+      return false;
+    }
+  }
+
+  // TELEGRAM & EMAIL INTEGRATION LOGIC
   async function sendTelegramAlert(text, force = false, alertType = 'checklist') {
     const token = localStorage.getItem('tg_bot_token') || '';
     const chatId = localStorage.getItem('tg_chat_id') || '';
     
+    // Also trigger Email alert
+    const lines = text.split('\n');
+    let subject = 'OptionPulse Alert';
+    if (lines.length > 0) {
+      subject = lines[0].replace(/[\*\_🚀🚨⚠️✍⭐]+/g, '').trim();
+      if (!subject) subject = 'OptionPulse Alert';
+    }
+    sendEmailAlert(subject, text, force, alertType);
+
     if (!token || !chatId) return false;
     
     if (!force) {
@@ -5084,6 +5186,102 @@ http.createServer((req, res) =&gt; {
     loadTelegramSettings();
   }
 
+  function loadEmailSettings() {
+    const recEl = document.getElementById('emailAlertRecipient');
+    const servEl = document.getElementById('emailjsServiceId');
+    const tempEl = document.getElementById('emailjsTemplateId');
+    const pubEl = document.getElementById('emailjsPublicKey');
+    const checklistEl = document.getElementById('emailAlertChecklist');
+    const paperEl = document.getElementById('emailAlertPaper');
+
+    if (recEl) recEl.value = localStorage.getItem('email_alert_recipient') || '';
+    if (servEl) servEl.value = localStorage.getItem('emailjs_service_id') || '';
+    if (tempEl) tempEl.value = localStorage.getItem('emailjs_template_id') || '';
+    if (pubEl) pubEl.value = localStorage.getItem('emailjs_public_key') || '';
+    if (checklistEl) checklistEl.checked = localStorage.getItem('email_alert_checklist') !== '0';
+    if (paperEl) paperEl.checked = localStorage.getItem('email_alert_paper') !== '0';
+  }
+
+  if (document.getElementById('emailSaveBtn')) {
+    document.getElementById('emailSaveBtn').addEventListener('click', () => {
+      const recipient = document.getElementById('emailAlertRecipient').value.trim();
+      const serviceId = document.getElementById('emailjsServiceId').value.trim();
+      const templateId = document.getElementById('emailjsTemplateId').value.trim();
+      const publicKey = document.getElementById('emailjsPublicKey').value.trim();
+      const chkChecklist = document.getElementById('emailAlertChecklist').checked;
+      const chkPaper = document.getElementById('emailAlertPaper').checked;
+
+      localStorage.setItem('email_alert_recipient', recipient);
+      localStorage.setItem('emailjs_service_id', serviceId);
+      localStorage.setItem('emailjs_template_id', templateId);
+      localStorage.setItem('emailjs_public_key', publicKey);
+      localStorage.setItem('email_alert_checklist', chkChecklist ? '1' : '0');
+      localStorage.setItem('email_alert_paper', chkPaper ? '1' : '0');
+
+      const msg = document.getElementById('emailStatusMsg');
+      msg.className = 'fetch-status ok';
+      msg.textContent = 'Email settings saved successfully!';
+      setTimeout(() => { msg.className = 'fetch-status idle'; msg.textContent = ''; }, 3000);
+    });
+
+    document.getElementById('emailTestBtn').addEventListener('click', async () => {
+      const recipient = document.getElementById('emailAlertRecipient').value.trim();
+      const serviceId = document.getElementById('emailjsServiceId').value.trim();
+      const templateId = document.getElementById('emailjsTemplateId').value.trim();
+      const publicKey = document.getElementById('emailjsPublicKey').value.trim();
+      const msg = document.getElementById('emailStatusMsg');
+
+      if (!recipient || !serviceId || !templateId || !publicKey) {
+        alert('Please fill out all EmailJS fields to run a test email.');
+        return;
+      }
+
+      msg.className = 'fetch-status loading';
+      msg.textContent = 'Sending test email...';
+
+      const oldRec = localStorage.getItem('email_alert_recipient');
+      const oldServ = localStorage.getItem('emailjs_service_id');
+      const oldTemp = localStorage.getItem('emailjs_template_id');
+      const oldPub = localStorage.getItem('emailjs_public_key');
+
+      localStorage.setItem('email_alert_recipient', recipient);
+      localStorage.setItem('emailjs_service_id', serviceId);
+      localStorage.setItem('emailjs_template_id', templateId);
+      localStorage.setItem('emailjs_public_key', publicKey);
+
+      const ok = await sendEmailAlert('Connection Test', 'Your EmailJS Integration with OptionPulse is working successfully!', true);
+
+      if (oldRec) localStorage.setItem('email_alert_recipient', oldRec); else localStorage.removeItem('email_alert_recipient');
+      if (oldServ) localStorage.setItem('emailjs_service_id', oldServ); else localStorage.removeItem('emailjs_service_id');
+      if (oldTemp) localStorage.setItem('emailjs_template_id', oldTemp); else localStorage.removeItem('emailjs_template_id');
+      if (oldPub) localStorage.setItem('emailjs_public_key', oldPub); else localStorage.removeItem('emailjs_public_key');
+
+      if (ok) {
+        msg.className = 'fetch-status ok';
+        msg.textContent = 'Test email alert sent successfully!';
+      } else {
+        msg.className = 'fetch-status err';
+        msg.textContent = 'Failed to send test email. Please check your credentials and EmailJS configuration.';
+      }
+    });
+
+    document.getElementById('emailClearBtn').addEventListener('click', () => {
+      if (confirm('Clear Email alerts configuration?')) {
+        localStorage.removeItem('email_alert_recipient');
+        localStorage.removeItem('emailjs_service_id');
+        localStorage.removeItem('emailjs_template_id');
+        localStorage.removeItem('emailjs_public_key');
+        loadEmailSettings();
+        const msg = document.getElementById('emailStatusMsg');
+        msg.className = 'fetch-status ok';
+        msg.textContent = 'Settings cleared.';
+        setTimeout(() => { msg.className = 'fetch-status idle'; msg.textContent = ''; }, 2000);
+      }
+    });
+
+    loadEmailSettings();
+  }
+
   // LIVE POSITIONS AUTO-SQUAREOFF TRACKING
   let livePositions = [];
   function loadLivePositions() {
@@ -5141,7 +5339,17 @@ http.createServer((req, res) =&gt; {
         }
       }
     }
+
+    // Auto-sync cockpit if enabled
+    const autoSyncEl = document.getElementById('cockpitAutoSync');
+    if (autoSyncEl && autoSyncEl.checked && Date.now() - lastCockpitSyncTime >= 30000) {
+      lastCockpitSyncTime = Date.now();
+      const fetchBtn = document.getElementById('cockpitFetchLive');
+      if (fetchBtn) fetchBtn.click();
+    }
   }
+
+  let lastCockpitSyncTime = 0;
 
   async function fetchPublicIP() {
     try {
@@ -5163,18 +5371,23 @@ http.createServer((req, res) =&gt; {
   setInterval(checkLiveTriggers, 1000);
 
   // USER SESSION MANAGEMENT & FEATURE GATING
+  const OWNER_EMAILS = ['owner@optionpulse.com', 'admin@optionpulse.com'];
   let currentUser = null;
   let authMode = 'login';
 
   function checkUserSession() {
     const email = localStorage.getItem('op_user_email');
-    const status = localStorage.getItem('op_subscription_status') || 'free';
+    let status = localStorage.getItem('op_subscription_status') || 'free';
     const trialStart = parseInt(localStorage.getItem('op_trial_start')) || 0;
 
     const navBtn = document.getElementById('navAuthBtn');
     
     if (email) {
-      currentUser = { email, status, trialStart };
+      const isOwner = OWNER_EMAILS.includes(email.toLowerCase());
+      if (isOwner) {
+        status = 'active';
+      }
+      currentUser = { email, status, trialStart, isOwner };
       
       let trialDaysRemaining = 0;
       if (status === 'trialing' && trialStart > 0) {
@@ -5183,7 +5396,12 @@ http.createServer((req, res) =&gt; {
       }
 
       if (navBtn) {
-        if (status === 'trialing') {
+        if (isOwner) {
+          navBtn.textContent = 'Owner Account';
+          navBtn.style.background = 'var(--accent)';
+          navBtn.style.borderColor = 'var(--accent)';
+          navBtn.style.color = '#06121f';
+        } else if (status === 'trialing') {
           navBtn.textContent = `Trial (${trialDaysRemaining}d remaining)`;
           navBtn.style.background = 'var(--amber)';
           navBtn.style.borderColor = 'var(--amber)';
