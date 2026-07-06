@@ -1365,14 +1365,30 @@
           <input type="text" id="dhanClientId" placeholder="1000000001">
         </div>
       </div>
-      <div class="tool-field" style="margin-bottom:18px;">
-        <label>Proxy Base URL (optional — only if direct calls get CORS-blocked)</label>
-        <input type="text" id="dhanProxy" placeholder="e.g. http://localhost:8787" value="http://localhost:8787">
-        <p style="color:var(--text-dim);font-size:.76rem;margin-top:6px;">Note: every time you download a new/updated version of this HTML file, you'll need to re-enter and re-save these three fields — browsers don't share saved data between separate file downloads.</p>
+
+      <div class="tool-grid-2" style="margin-top:12px; border-top:1px dashed var(--border); padding-top:12px;">
+        <div class="tool-field">
+          <label>Dhan Login PIN (6 digits) <span style="color:var(--text-dim);font-size:.74rem;">— Only for Auto Token Renew</span></label>
+          <input type="password" id="dhanPin" placeholder="e.g. 123456">
+        </div>
+        <div class="tool-field">
+          <label>Dhan TOTP Secret Key (Base32) <span style="color:var(--text-dim);font-size:.74rem;">— Only for Auto Token Renew</span></label>
+          <input type="password" id="dhanTotpSecret" placeholder="e.g. NRSXG5A...">
+        </div>
       </div>
 
-      <div class="row-actions" style="align-items:center;">
+      <div class="tool-field" style="margin-top:12px; margin-bottom:18px;">
+        <label>Proxy Base URL (optional — only if direct calls get CORS-blocked)</label>
+        <input type="text" id="dhanProxy" placeholder="e.g. http://localhost:8787" value="http://localhost:8787">
+        <p style="color:var(--text-dim);font-size:.76rem;margin-top:6px;">Note: every time you download a new/updated version of this HTML file, you'll need to re-enter and re-save these fields — browsers don't share saved data between separate file downloads.</p>
+      </div>
+
+      <div class="row-actions" style="align-items:center; flex-wrap:wrap; gap:10px;">
         <button class="btn btn-primary btn-sm" id="dhanTestBtn">Test Connection</button>
+        <button class="btn btn-outline btn-sm" id="dhanGenerateTokenBtn" style="background:#818cf8; border-color:#818cf8; color:#fff; display:inline-flex; align-items:center; gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+          Auto-Renew Token
+        </button>
         <button class="btn btn-ghost btn-sm" id="dhanSaveBtn">Save in This Browser</button>
         <button class="btn btn-ghost btn-sm" id="dhanClearBtn">Clear Saved Credentials</button>
       </div>
@@ -1875,7 +1891,7 @@ http.createServer((req, res) =&gt; {
       </div>
       <div style="margin:14px 0;"><span class="bias-badge neutral">Neutral / Range-bound</span></div>
       <div class="strike-result sweet">
-        ✅ Sweet-spot strikes (₹60–₹70): 22000 CE PE
+        ✅ Sweet-spot strikes (₹60–₹70): 24400 CE PE
       </div>
     </div>
 
@@ -1901,7 +1917,7 @@ http.createServer((req, res) =&gt; {
       </div>
     </div>
 
-    <p class="tool-note">Common heuristic: PCR (Put OI ÷ Call OI) above ~1.3 is read as bullish (heavy put writing = support building), below ~0.7 as bearish (heavy call writing = resistance building), and in between as neutral/range-bound. Treat PCR as one input alongside price action and VWAP — not a signal on its own.</p>
+    <p class="tool-note">Common heuristic: PCR (Put OI ÷ Call OI) above ~1.25 is read as bullish (heavy put writing = support building), below ~0.75 as bearish (heavy call writing = resistance building), and in between as neutral/range-bound. Treat PCR as one input alongside price action and VWAP — not a signal on its own.</p>
     </div>
   </section>
 
@@ -1939,7 +1955,7 @@ http.createServer((req, res) =&gt; {
         </div>
         <div class="tool-field">
           <label>Strike Price</label>
-          <input type="number" id="cockpitStrike" value="22000">
+          <input type="number" id="cockpitStrike" value="24400">
         </div>
         <div class="tool-field">
           <label>Underlying (Presets sync values)</label>
@@ -1980,7 +1996,7 @@ http.createServer((req, res) =&gt; {
         </div>
         <div class="stat-card" id="sigPcrCard">
           <div class="v" id="sigPcrVal" style="color:var(--text-dim);">—</div>
-          <div class="l">PCR Bias (CE >1.25, PE <0.70)</div>
+          <div class="l">PCR Bias (CE >= 1.25, PE < 0.75)</div>
         </div>
       </div>
 
@@ -2918,9 +2934,15 @@ http.createServer((req, res) =&gt; {
     const t = localStorage.getItem('dhan_token');
     const c = localStorage.getItem('dhan_client_id');
     const p = localStorage.getItem('dhan_proxy') || 'http://localhost:8787';
+    const pin = localStorage.getItem('dhan_pin') || '';
+    const secret = localStorage.getItem('dhan_totp_secret') || '';
+    
     if (t) document.getElementById('dhanToken').value = t;
     if (c) document.getElementById('dhanClientId').value = c;
     document.getElementById('dhanProxy').value = p;
+    if (pin) document.getElementById('dhanPin').value = pin;
+    if (secret) document.getElementById('dhanTotpSecret').value = secret;
+    
     if (t && c) setDhanStatus('idle', 'Loaded saved credentials — click Test Connection');
   }
 
@@ -2931,10 +2953,17 @@ http.createServer((req, res) =&gt; {
   }
 
   document.getElementById('dhanSaveBtn').addEventListener('click', () => {
-    const { token, clientId, proxy } = getDhanCreds();
+    const token = document.getElementById('dhanToken').value.trim();
+    const clientId = document.getElementById('dhanClientId').value.trim();
+    const proxy = document.getElementById('dhanProxy').value.trim();
+    const pin = document.getElementById('dhanPin').value.trim();
+    const secret = document.getElementById('dhanTotpSecret').value.trim();
+    
     localStorage.setItem('dhan_token', token);
     localStorage.setItem('dhan_client_id', clientId);
     localStorage.setItem('dhan_proxy', proxy);
+    localStorage.setItem('dhan_pin', pin);
+    localStorage.setItem('dhan_totp_secret', secret);
     setDhanStatus('idle', 'Saved in this browser');
   });
 
@@ -2942,10 +2971,70 @@ http.createServer((req, res) =&gt; {
     localStorage.removeItem('dhan_token');
     localStorage.removeItem('dhan_client_id');
     localStorage.removeItem('dhan_proxy');
+    localStorage.removeItem('dhan_pin');
+    localStorage.removeItem('dhan_totp_secret');
+    
     document.getElementById('dhanToken').value = '';
     document.getElementById('dhanClientId').value = '';
-    document.getElementById('dhanProxy').value = '';
+    document.getElementById('dhanProxy').value = 'http://localhost:8787';
+    document.getElementById('dhanPin').value = '';
+    document.getElementById('dhanTotpSecret').value = '';
     setDhanStatus('idle', 'Credentials cleared');
+  });
+
+  document.getElementById('dhanGenerateTokenBtn').addEventListener('click', async () => {
+    const clientId = document.getElementById('dhanClientId').value.trim();
+    const pin = document.getElementById('dhanPin').value.trim();
+    const secret = document.getElementById('dhanTotpSecret').value.trim();
+    const proxy = document.getElementById('dhanProxy').value.trim() || 'http://localhost:8787';
+
+    if (!clientId || !pin || !secret) {
+      alert('Please fill out Client ID, Login PIN, and TOTP Secret Key in the connection settings first.');
+      return;
+    }
+
+    setDhanStatus('idle', 'Pinging local proxy to auto-renew token...');
+    const alive = await pingProxy(proxy);
+    if (!alive) {
+      setDhanStatus('err', 'Proxy not reachable at ' + proxy + '. Start it with "node dhan-proxy.js" and keep that terminal open, then try again.');
+      return;
+    }
+
+    setDhanStatus('idle', 'Generating fresh Dhan Access Token...');
+    try {
+      const res = await fetch(proxy.replace(/\/$/, '') + '/auth/generateToken', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dhanClientId: clientId, pin, totpSecret: secret })
+      });
+      
+      if (!res.ok) {
+        let errText = res.status + ' ' + res.statusText;
+        try { const errObj = await res.json(); errText += ' — ' + (errObj.message || errObj.errorMessage || JSON.stringify(errObj)); } catch(e) {}
+        throw new Error('Proxy Auth failed: ' + errText);
+      }
+
+      const data = await res.json();
+      if (!data.accessToken) {
+        throw new Error('Proxy returned successfully but no accessToken was found in payload.');
+      }
+
+      document.getElementById('dhanToken').value = data.accessToken;
+      
+      localStorage.setItem('dhan_token', data.accessToken);
+      localStorage.setItem('dhan_client_id', clientId);
+      localStorage.setItem('dhan_proxy', proxy);
+      localStorage.setItem('dhan_pin', pin);
+      localStorage.setItem('dhan_totp_secret', secret);
+      
+      setDhanStatus('ok', 'Token Auto-Renewed & Saved successfully!');
+      alert('Success: New Dhan Access Token generated and saved! Valid for next 24 hours.');
+      
+      document.getElementById('dhanTestBtn').click();
+
+    } catch (e) {
+      setDhanStatus('err', 'Failed to generate token: ' + e.message);
+    }
   });
 
   document.getElementById('dhanTestBtn').addEventListener('click', async () => {
@@ -3680,6 +3769,17 @@ http.createServer((req, res) =&gt; {
       const spot = data.last_price;
       lastFetchedSpot = spot; // Save spot price globally
       
+      // Auto-sync cockpit strike to ATM if the scanner index matches the cockpit preset
+      const scanIdx = document.getElementById('scanUnderlying').value;
+      const cockPreset = cockpitPreset.value;
+      const isMatch = (scanIdx === '13' && cockPreset === 'nifty') ||
+                      (scanIdx === '25' && cockPreset === 'banknifty') ||
+                      (scanIdx === '27' && cockPreset === 'finnifty') ||
+                      (scanIdx === '17' && cockPreset === 'sensex');
+      if (isMatch) {
+        syncCockpitStrikeToATM();
+      }
+      
       const strikes = Object.keys(oc).map(Number).sort((a, b) => a - b);
       if (!strikes.length) throw new Error('No strikes returned for this expiry.');
 
@@ -3784,7 +3884,7 @@ http.createServer((req, res) =&gt; {
     const pcr = totalCeOi > 0 ? totalPeOi / totalCeOi : 0;
     let bias, biasClass;
     if (pcr > 1.25) { bias = 'Bullish Bias (Institutional Support) 📈'; biasClass = 'bull'; }
-    else if (pcr < 0.70) { bias = 'Bearish Bias (Institutional Resistance) 📉'; biasClass = 'bear'; }
+    else if (pcr < 0.75) { bias = 'Bearish Bias (Institutional Resistance) 📉'; biasClass = 'bear'; }
     else { bias = 'Neutral / Range-bound ➡️'; biasClass = 'neutral'; }
 
     const sweetStrikes = parsed.filter(r => r.ceSweet || r.peSweet)
@@ -3971,7 +4071,7 @@ http.createServer((req, res) =&gt; {
         sigPcrCard.style.boxShadow = "0 0 12px rgba(34, 197, 94, 0.15)";
         sigPcrCard.style.background = "rgba(34, 197, 94, 0.02)";
       } else {
-        const isBear = pcr < 0.70;
+        const isBear = pcr < 0.75;
         sigPcrVal.textContent = isBear ? `BEARISH ❌ (${pcr.toFixed(2)})` : `NEUTRAL ⚠️ (${pcr.toFixed(2)})`;
         sigPcrVal.style.color = isBear ? "var(--red)" : "var(--amber)";
         sigPcrCard.style.borderColor = isBear ? "var(--red)" : "var(--amber)";
@@ -3979,7 +4079,7 @@ http.createServer((req, res) =&gt; {
         sigPcrCard.style.background = isBear ? "rgba(239, 68, 68, 0.02)" : "rgba(245, 158, 11, 0.02)";
       }
     } else {
-      isPcrOk = pcr <= 0.70;
+      isPcrOk = pcr < 0.75;
       if (isPcrOk) {
         sigPcrVal.textContent = `BEARISH ✅ (${pcr.toFixed(2)})`;
         sigPcrVal.style.color = "var(--green)";
@@ -4094,7 +4194,7 @@ http.createServer((req, res) =&gt; {
         statusEl.className = "fetch-status err";
       }
     } else {
-      const spot = lastFetchedSpot || (preset === 'banknifty' ? 48000 : (preset === 'sensex' ? 72000 : (preset === 'finnifty' ? 21000 : 22000)));
+      const spot = lastFetchedSpot || (preset === 'banknifty' ? 52500 : (preset === 'sensex' ? 80000 : (preset === 'finnifty' ? 24000 : 24400)));
       const t = 4 / 365;
       const r = 0.07;
       const iv = preset === 'banknifty' ? 0.18 : (preset === 'sensex' ? 0.14 : (preset === 'finnifty' ? 0.16 : 0.15));
@@ -4107,18 +4207,37 @@ http.createServer((req, res) =&gt; {
     evaluateCockpitRules();
   });
 
-  cockpitPreset.addEventListener('change', () => {
-    const val = cockpitPreset.value;
-    if (val === 'nifty') {
-      cockpitStrike.value = 22000;
-    } else if (val === 'banknifty') {
-      cockpitStrike.value = 48000;
-    } else if (val === 'finnifty') {
-      cockpitStrike.value = 21000;
-    } else if (val === 'sensex') {
-      cockpitStrike.value = 72000;
+  function syncCockpitStrikeToATM() {
+    const preset = cockpitPreset.value;
+    const spot = lastFetchedSpot;
+    
+    let step = 50;
+    let defaultStrike = 24400;
+    
+    if (preset === 'banknifty') {
+      step = 100;
+      defaultStrike = 52500;
+    } else if (preset === 'finnifty') {
+      step = 50;
+      defaultStrike = 24000;
+    } else if (preset === 'sensex') {
+      step = 100;
+      defaultStrike = 80000;
+    } else if (preset === 'nifty') {
+      step = 50;
+      defaultStrike = 24400;
+    }
+
+    if (spot > 0) {
+      cockpitStrike.value = Math.round(spot / step) * step;
+    } else {
+      cockpitStrike.value = defaultStrike;
     }
     evaluateCockpitRules();
+  }
+
+  cockpitPreset.addEventListener('change', () => {
+    syncCockpitStrikeToATM();
   });
 
   function minutesToTimeStr(m) {
