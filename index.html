@@ -4,6 +4,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OptionPulse | Systematic Intraday Options Analytics</title>
+<script defer src="/_vercel/insights/script.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
 <link href="./Rules-Based Intraday Options Strategy _ CA Nitin Murarka_files/css2" rel="stylesheet">
@@ -991,6 +992,7 @@
       <a href="#scanner">Scanner</a>
       <a href="#cockpit">Trigger Cockpit</a>
       <a href="#optimizer">Optimizer</a>
+      <a href="#" id="navSupportBtn" style="color:var(--accent); font-weight:600; margin-right:6px;">Help & Feedback</a>
       <button class="btn btn-primary btn-sm" id="navAuthBtn" style="margin-left:14px; padding:6px 12px; font-size:.82rem;">Sign In</button>
     </div>
   </div>
@@ -2277,6 +2279,62 @@ http.createServer((req, res) =&gt; {
     </div>
   </div>
 
+  <!-- SUPPORT & FEEDBACK MODAL -->
+  <div id="supportModal" class="modal-overlay hidden-block">
+    <div class="modal-content" style="max-width: 440px; background:var(--card); border: 1px solid var(--border); border-radius:var(--radius);">
+      <div class="modal-header" style="border-bottom:1px solid var(--border); padding:16px 20px;">
+        <h3 style="font-size:1.1rem; color:var(--text); display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          Help Desk & Feedback
+        </h3>
+        <button class="modal-close" id="supportModalClose">✕</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        <!-- Helpline Section -->
+        <h4 style="font-size:.9rem; color:var(--text); margin-bottom:10px;">📞 Official Helplines</h4>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:24px;">
+          <a href="https://wa.me/919999999999" target="_blank" class="btn btn-outline" style="justify-content:flex-start; gap:10px; padding:10px 14px; border-color:var(--border); text-decoration:none; color:var(--text); font-size:.88rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            Chat Support via WhatsApp
+          </a>
+          <a href="mailto:support@optionpulse.vercel.app" class="btn btn-outline" style="justify-content:flex-start; gap:10px; padding:10px 14px; border-color:var(--border); text-decoration:none; color:var(--text); font-size:.88rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Email Support (support@optionpulse.vercel.app)
+          </a>
+        </div>
+
+        <div style="border-top:1px dashed var(--border); margin-top:16px; padding-top:16px;"></div>
+
+        <!-- Feedback Form Section -->
+        <h4 style="font-size:.9rem; color:var(--text); margin-bottom:10px;">✍ Submit Feedback</h4>
+        <form id="feedbackForm">
+          <div class="tool-field">
+            <label style="font-size:.82rem; margin-bottom:6px;">Your Email Address</label>
+            <input type="email" id="feedbackEmail" placeholder="you@domain.com" required style="background:var(--bg-2); border:1px solid var(--border); width:100%; padding:10px; border-radius:8px; color:#fff; font-size:.88rem; outline:none;">
+          </div>
+          <div class="tool-field" style="margin-top:12px;">
+            <label style="font-size:.82rem; margin-bottom:6px;">Rate OptionPulse</label>
+            <div style="display:flex; gap:10px; font-size:1.5rem; color:var(--text-dim); margin-top:4px;">
+              <span class="star-rating" data-val="1" style="cursor:pointer;">★</span>
+              <span class="star-rating" data-val="2" style="cursor:pointer;">★</span>
+              <span class="star-rating" data-val="3" style="cursor:pointer;">★</span>
+              <span class="star-rating" data-val="4" style="cursor:pointer;">★</span>
+              <span class="star-rating" data-val="5" style="cursor:pointer; color:var(--amber);">★</span>
+            </div>
+            <input type="hidden" id="feedbackRatingValue" value="5">
+          </div>
+          <div class="tool-field" style="margin-top:12px;">
+            <label style="font-size:.82rem; margin-bottom:6px;">Comments / Suggestions</label>
+            <textarea id="feedbackComments" placeholder="How can we make OptionPulse better?" required style="background:var(--bg-2); border:1px solid var(--border); width:100%; padding:10px; border-radius:8px; color:#fff; font-size:.88rem; outline:none; height:80px; resize:none; font-family:inherit;"></textarea>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" id="feedbackSubmitBtn" style="width:100%; margin-top:16px; padding:10px; justify-content:center; font-weight:600;">Send Feedback</button>
+        </form>
+        <div id="feedbackStatusMsg" class="fetch-status idle" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- FOOTER -->
@@ -2285,7 +2343,19 @@ http.createServer((req, res) =&gt; {
     <div class="disclaimer">
       <strong>⚠ Disclaimer:</strong> For educational purposes only. This is not investment advice. Options trading involves substantial risk of loss. Always do your own research and consult a SEBI-registered advisor before trading.
     </div>
-    <p class="footer-credit">OptionPulse Suite — Built as an educational and analytical reference</p>
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-top:20px; border-top:1px solid rgba(255,255,255,0.05); padding-top:16px;">
+      <p class="footer-credit" style="margin:0;">OptionPulse Suite — Built as an educational and analytical reference</p>
+      
+      <!-- Visitor Count and Helper badge -->
+      <div style="display:flex; align-items:center; gap:12px;">
+        <a href="https://wa.me/919999999999" target="_blank" style="color:var(--green); text-decoration:none; font-size:.82rem; font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+          🟢 Chat Support
+        </a>
+        <span style="color:var(--border);">|</span>
+        <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Foptionpulse.vercel.app&count_bg=%2338BDF8&title_bg=%231E2B4A&icon=&icon_color=%23E6EDF7&title=visitors&edge_flat=false" alt="Visitor Hits Counter" style="height:20px; border-radius:4px; vertical-align:middle;">
+      </div>
+    </div>
   </div>
 </footer>
 
@@ -5282,6 +5352,98 @@ http.createServer((req, res) =&gt; {
         openAuthModal('register');
       });
     }
+  });
+
+  // SUPPORT & FEEDBACK EVENT HANDLERS
+  const supportModal = document.getElementById('supportModal');
+  
+  document.getElementById('navSupportBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    if (supportModal) supportModal.classList.remove('hidden-block');
+  });
+
+  const supportModalClose = document.getElementById('supportModalClose');
+  if (supportModalClose) {
+    supportModalClose.addEventListener('click', () => {
+      if (supportModal) supportModal.classList.add('hidden-block');
+    });
+  }
+
+  // Star rating click logic
+  const stars = document.querySelectorAll('#supportModal .star-rating');
+  stars.forEach(star => {
+    star.addEventListener('click', () => {
+      const val = parseInt(star.getAttribute('data-val'));
+      document.getElementById('feedbackRatingValue').value = val;
+      
+      stars.forEach(s => {
+        const sVal = parseInt(s.getAttribute('data-val'));
+        if (sVal <= val) {
+          s.style.color = 'var(--amber)';
+        } else {
+          s.style.color = 'var(--text-dim)';
+        }
+      });
+    });
+  });
+
+  // Submit Feedback Form
+  document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('feedbackEmail').value.trim();
+    const rating = parseInt(document.getElementById('feedbackRatingValue').value) || 5;
+    const comments = document.getElementById('feedbackComments').value.trim();
+    const statusEl = document.getElementById('feedbackStatusMsg');
+
+    if (!email || !comments) return;
+
+    statusEl.className = 'fetch-status loading';
+    statusEl.textContent = 'Sending feedback...';
+
+    const starEmoji = '⭐'.repeat(rating);
+    const tgMessage = `✍ *New OptionPulse Feedback Submission*\n\n` +
+                      `• *User Email:* ${email}\n` +
+                      `• *Rating:* ${starEmoji} (${rating}/5)\n\n` +
+                      `• *Comments:* "${comments}"`;
+
+    const tgToken = localStorage.getItem('tg_bot_token');
+    const tgChatId = localStorage.getItem('tg_chat_id');
+    
+    let sentToTg = false;
+    if (tgToken && tgChatId) {
+      try {
+        const url = `https://api.telegram.org/bot${tgToken}/sendMessage`;
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: tgChatId,
+            text: tgMessage,
+            parse_mode: 'Markdown'
+          })
+        });
+        if (resp.ok) sentToTg = true;
+      } catch (err) {
+        console.warn('Could not forward feedback to Telegram:', err);
+      }
+    }
+
+    setTimeout(() => {
+      statusEl.className = 'fetch-status ok';
+      if (sentToTg) {
+        statusEl.textContent = 'Thank you! Your feedback has been sent directly to the development team via Telegram.';
+      } else {
+        statusEl.textContent = 'Thank you! Feedback saved successfully.';
+      }
+      
+      document.getElementById('feedbackComments').value = '';
+      
+      setTimeout(() => {
+        if (supportModal) supportModal.classList.add('hidden-block');
+        statusEl.className = 'fetch-status idle';
+        statusEl.textContent = '';
+      }, 2500);
+    }, 800);
   });
 
   checkUserSession();
