@@ -983,17 +983,15 @@
   <div class="nav-inner">
     <a href="#top" class="nav-brand"><span class="dot"></span> OptionPulse</a>
     <div class="nav-links" style="align-items:center; display:flex;">
-      <a href="#strikes">Strike Selection</a>
-      <a href="#execution">11 AM Rule</a>
-      <a href="#gaps">Gap Handling</a>
+      <a href="#strikes">Strategy Rules</a>
       <a href="#checklist">Checklist</a>
-      <a href="#calculator">Calculator</a>
-      <a href="#dhanConnect">Live Data</a>
-      <a href="#backtester">Backtester</a>
-      <a href="#scanner">Scanner</a>
-      <a href="#cockpit">Trigger Cockpit</a>
-      <a href="#optimizer">Optimizer</a>
-      <a href="#" id="navSupportBtn" style="color:var(--accent); font-weight:600; margin-right:6px;">Help & Feedback</a>
+      <a href="#calculator">Sweet Spot Calculator</a>
+      <a href="#optimizer">Position Sizing</a>
+      <a href="#parameter-sweeper">Parameter Sweep</a>
+      <a href="#telegramConnect">Alerts</a>
+      <a href="#" id="navPricingBtn" style="color:var(--accent); font-weight:600; margin-right:6px;">Pricing</a>
+      <a href="#" id="navSupportBtn" style="color:var(--green); font-weight:600; margin-right:6px; margin-left:6px;">Help Desk</a>
+      <a href="#dhanConnect" id="navDhanLink" style="display:none; color:var(--text-dim); margin-left:6px;">Live Connection (Owner)</a>
       <button class="btn btn-primary btn-sm" id="navAuthBtn" style="margin-left:14px; padding:6px 12px; font-size:.82rem;">Sign In</button>
     </div>
   </div>
@@ -1026,56 +1024,7 @@
     </div>
   </section>
 
-  <!-- PRICING PLANS -->
-  <section id="pricing" class="fade-in visible" style="margin-top:20px; margin-bottom:40px;">
-    <span class="section-label">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-      Membership Plans
-    </span>
-    <h2>Select Your OptionPulse Tier</h2>
-    <p class="section-intro">Start with our free core tools, or unlock the full algorithmic analytics suite with a 15-day risk-free trial.</p>
 
-    <div style="margin-top:28px; gap:24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));">
-      <!-- Free Tier Card -->
-      <div class="card" style="border: 1px solid var(--border); border-radius: var(--radius); padding: 30px; display: flex; flex-direction: column; justify-content: space-between; background: var(--card); transition: transform 0.2s, box-shadow 0.2s;">
-        <div>
-          <div style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: 1px; margin-bottom: 8px;">Free Basic Tier</div>
-          <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 12px; color: var(--text);">OptionPulse Lite</h3>
-          <div style="font-size: 2rem; font-weight: 800; color: var(--text); margin-bottom: 16px;">₹0 <span style="font-size: 1rem; font-weight: 400; color: var(--text-dim);">/ forever</span></div>
-          <p style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; margin-bottom: 24px;">Essential options trading calculators and guidelines to keep your strategy discipline in check.</p>
-          <ul style="list-style: none; padding: 0; margin: 0 0 28px 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem; color: var(--text);">
-            <li style="display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> Systematic Option Rules Checklist</li>
-            <li style="display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> Sweet-Spot Delta & Strike Calculator</li>
-            <li style="display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> Manual Black-Scholes Strike Table</li>
-            <li style="color: var(--text-dim); text-decoration: line-through; display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"></path></svg> Live Option Chain Scanner (Dhan)</li>
-            <li style="color: var(--text-dim); text-decoration: line-through; display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"></path></svg> Historical Multi-Year Backtester</li>
-            <li style="color: var(--text-dim); text-decoration: line-through; display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"></path></svg> Parameter Sweep Optimizer</li>
-          </ul>
-        </div>
-        <a href="#calculator" class="btn btn-ghost" style="width: 100%; text-align: center;">Use Free Tools</a>
-      </div>
-
-      <!-- Pro Tier Card -->
-      <div class="card" style="border: 2px solid var(--accent); border-radius: var(--radius); padding: 30px; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(135deg, var(--card) 0%, rgba(24,35,62,0.6) 100%); position: relative; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 10px 40px rgba(56,189,248,0.15);">
-        <div style="position: absolute; top: -14px; right: 24px; background: var(--accent); color: var(--bg); font-size: 0.76rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px;">Most Popular</div>
-        <div>
-          <div style="font-size: 0.85rem; text-transform: uppercase; color: var(--accent); font-weight: 700; letter-spacing: 1px; margin-bottom: 8px;">15-Day Free Trial</div>
-          <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 12px; color: var(--text);">OptionPulse Pro</h3>
-          <div style="font-size: 2rem; font-weight: 800; color: var(--text); margin-bottom: 16px;">₹1,499 <span style="font-size: 1rem; font-weight: 400; color: var(--text-dim);">/ month</span></div>
-          <p style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; margin-bottom: 24px;">Unleash the full potential of live scanning, multi-year backtesting, optimization sweeps, and instant alerts.</p>
-          <ul style="list-style: none; padding: 0; margin: 0 0 28px 0; display: flex; flex-direction: column; gap: 12px; font-size: 0.88rem; color: var(--text);">
-            <li style="display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Live Option Chain Scanner</strong> (Dhan API)</li>
-            <li style="display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Direct Live Order Placement</strong> to Dhan</li>
-            <li style="display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Multi-Year Backtester</strong> (IndexedDB Caching)</li>
-            <li style="display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Parameter Sweep Optimizer</strong></li>
-            <li style="display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Telegram Bot Notifications</strong> (SL & Target hits)</li>
-            <li style="display: flex; align-items: center; gap: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Real-time Paper Trading Position</strong> manager</li>
-          </ul>
-        </div>
-        <button class="btn btn-primary" id="pricingTrialBtn" style="width: 100%; text-align: center;">Start 15-Day Free Trial</button>
-      </div>
-    </div>
-  </section>
 
   <!-- STRIKE SELECTION -->
   <section id="strikes" class="fade-in visible">
@@ -1954,7 +1903,12 @@ http.createServer((req, res) =&gt; {
           </select>
         </div>
         <div class="tool-field">
-          <label>Strike Price</label>
+          <label style="display:flex; justify-content:space-between; align-items:center;">
+            Strike Price
+            <label style="display:inline-flex; align-items:center; gap:3px; font-size:0.75rem; color:var(--accent); cursor:pointer; margin:0; user-select:none;">
+              <input type="checkbox" id="cockpitAutoDeltaStrike" checked style="width:12px; height:12px; cursor:pointer;"> Auto-Delta (0.32)
+            </label>
+          </label>
           <input type="number" id="cockpitStrike" value="24400">
         </div>
         <div class="tool-field">
@@ -1980,6 +1934,23 @@ http.createServer((req, res) =&gt; {
         <div class="tool-field">
           <label>Current Index PCR</label>
           <input type="number" id="cockpitPcr" value="0.98" step="0.05">
+        </div>
+      </div>
+
+      <div class="tool-grid-3" style="margin-top:12px; border-top:1px dashed var(--border); padding-top:12px;">
+        <div class="tool-field">
+          <label>Selected Contract Expiry</label>
+          <div style="background:var(--bg-2); border:1px solid var(--border); padding:10px; border-radius:8px; color:var(--accent); font-weight:700; font-size:.88rem; min-height:41px;" id="cockpitExpiryDisplay">Current Week</div>
+        </div>
+        <div class="tool-field">
+          <label>Calculated Option Delta</label>
+          <div style="background:var(--bg-2); border:1px solid var(--border); padding:10px; border-radius:8px; color:var(--green); font-weight:700; font-size:.88rem; min-height:41px;" id="cockpitDeltaDisplay">—</div>
+          <div style="font-size:0.75rem; color:var(--text-dim); margin-top:5px; font-weight:500; line-height:1.2;" id="cockpitDeltaHint">Select OTM strikes with Delta between 0.30 - 0.35.</div>
+        </div>
+        <div class="tool-field">
+          <label>Contract Security ID (Dhan)</label>
+          <div style="background:var(--bg-2); border:1px solid var(--border); padding:10px; border-radius:8px; color:var(--text-dim); font-size:.88rem; min-height:41px; font-family:monospace;" id="cockpitSecIdDisplay">Manual Setup</div>
+          <input type="hidden" id="cockpitSecId" value="">
         </div>
       </div>
 
@@ -2394,6 +2365,63 @@ http.createServer((req, res) =&gt; {
           <button type="submit" class="btn btn-primary" id="feedbackSubmitBtn" style="width:100%; margin-top:16px; padding:10px; justify-content:center; font-weight:600;">Send Feedback</button>
         </form>
         <div id="feedbackStatusMsg" class="fetch-status idle" style="margin-top:14px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICING PLANS MODAL -->
+  <div id="pricingModal" class="modal-overlay hidden-block">
+    <div class="modal-content" style="max-width: 750px; background:var(--card); border: 1px solid var(--border); border-radius:var(--radius);">
+      <div class="modal-header" style="border-bottom:1px solid var(--border); padding:16px 20px;">
+        <h3 style="font-size:1.1rem; color:var(--text); display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          OptionPulse Membership Plans
+        </h3>
+        <button class="modal-close" id="pricingModalClose">✕</button>
+      </div>
+      <div class="modal-body" style="padding:24px;">
+        <p style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; text-align: center;">Unlock professional algorithmic options analytics or start exploring with our free tools.</p>
+        
+        <div style="gap:20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));">
+          <!-- Free Tier Card -->
+          <div class="card" style="border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; background: var(--card);">
+            <div>
+              <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; letter-spacing: 1px; margin-bottom: 6px;">Free Basic Tier</div>
+              <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 8px; color: var(--text);">OptionPulse Lite</h3>
+              <div style="font-size: 1.6rem; font-weight: 800; color: var(--text); margin-bottom: 12px;">₹0 <span style="font-size: 0.85rem; font-weight: 400; color: var(--text-dim);">/ forever</span></div>
+              <p style="color: var(--text-dim); font-size: 0.85rem; line-height: 1.4; margin-bottom: 18px;">Essential options trading calculators and guidelines to keep your strategy discipline in check.</p>
+              <ul style="list-style: none; padding: 0; margin: 0 0 20px 0; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; color: var(--text);">
+                <li style="display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> Systematic Option Rules Checklist</li>
+                <li style="display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> Sweet-Spot Delta & Strike Calculator</li>
+                <li style="display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> Manual Black-Scholes Strike Table</li>
+                <li style="color: var(--text-dim); text-decoration: line-through; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"></path></svg> Live Option Chain Scanner (Dhan)</li>
+                <li style="color: var(--text-dim); text-decoration: line-through; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"></path></svg> Historical Multi-Year Backtester</li>
+                <li style="color: var(--text-dim); text-decoration: line-through; display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"></path></svg> Parameter Sweep Optimizer</li>
+              </ul>
+            </div>
+            <button class="btn btn-ghost" id="pricingModalLiteBtn" style="width: 100%; text-align: center; padding:8px 12px; font-size:.82rem;">Use Free Tools</button>
+          </div>
+
+          <!-- Pro Tier Card -->
+          <div class="card" style="border: 2px solid var(--accent); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(135deg, var(--card) 0%, rgba(24,35,62,0.6) 100%); position: relative; box-shadow: 0 10px 30px rgba(56,189,248,0.12);">
+            <div style="position: absolute; top: -10px; right: 16px; background: var(--accent); color: var(--bg); font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px;">Most Popular</div>
+            <div>
+              <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--accent); font-weight: 700; letter-spacing: 1px; margin-bottom: 6px;">15-Day Free Trial</div>
+              <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 8px; color: var(--text);">OptionPulse Pro</h3>
+              <div style="font-size: 1.6rem; font-weight: 800; color: var(--text); margin-bottom: 12px;">₹1,499 <span style="font-size: 0.85rem; font-weight: 400; color: var(--text-dim);">/ month</span></div>
+              <p style="color: var(--text-dim); font-size: 0.85rem; line-height: 1.4; margin-bottom: 18px;">Unleash the full potential of live scanning, multi-year backtesting, optimization sweeps, and instant alerts.</p>
+              <ul style="list-style: none; padding: 0; margin: 0 0 20px 0; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; color: var(--text);">
+                <li style="display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Live Option Chain Scanner</strong></li>
+                <li style="display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Direct Live Order Placement</strong></li>
+                <li style="display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Multi-Year Backtester</strong> (IndexedDB Caching)</li>
+                <li style="display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Parameter Sweep Optimizer</strong></li>
+                <li style="display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Telegram & Email Alerts</strong></li>
+                <li style="display: flex; align-items: center; gap: 6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg> <strong>Real-time Paper Trading</strong></li>
+              </ul>
+            </div>
+            <button class="btn btn-primary" id="pricingModalProBtn" style="width: 100%; text-align: center; padding:8px 12px; font-size:.82rem;">Start 15-Day Free Trial</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -3016,7 +3044,8 @@ http.createServer((req, res) =&gt; {
 
       const data = await res.json();
       if (!data.accessToken) {
-        throw new Error('Proxy returned successfully but no accessToken was found in payload.');
+        const errMsg = data.remarks || data.errorMessage || data.message || ('Auth failed. Response: ' + JSON.stringify(data));
+        throw new Error(errMsg);
       }
 
       document.getElementById('dhanToken').value = data.accessToken;
@@ -3743,11 +3772,49 @@ http.createServer((req, res) =&gt; {
       const expiries = resp.data || [];
       const sel = document.getElementById('scanExpiry');
       sel.innerHTML = expiries.map(e => `<option value="${e}">${e}</option>`).join('');
+      
       statusEl.className = 'fetch-status ok';
       statusEl.textContent = `Loaded ${expiries.length} expiries.`;
+
+      // Expiry Day Exception Check
+      if (expiries.length > 0) {
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const istTime = new Date(utc + (3600000 * 5.5)); // UTC+5.5
+        const todayISTStr = istTime.toISOString().slice(0, 10); // "YYYY-MM-DD"
+        
+        if (expiries[0] === todayISTStr && expiries.length > 1) {
+          sel.selectedIndex = 1;
+          sel.dispatchEvent(new Event('change'));
+          statusEl.textContent = `Loaded ${expiries.length} expiries. ⚠️ Expiry Day Exception: Automatically selected next week's expiry (${expiries[1]}) to avoid extreme Theta decay.`;
+        }
+      }
     } catch (e) {
       statusEl.className = 'fetch-status err';
       statusEl.textContent = e.message;
+    }
+  });
+
+  document.getElementById('scanExpiry').addEventListener('change', () => {
+    const sel = document.getElementById('scanExpiry');
+    const underlying = document.getElementById('scanUnderlying').value; // '13' Nifty, '25' Bank Nifty, '27' Fin Nifty, '17' Sensex
+    const isNextWeek = sel.selectedIndex > 0;
+    
+    const minPInput = document.getElementById('targetPremiumMin');
+    const maxPInput = document.getElementById('targetPremiumMax');
+    
+    if (underlying === '13') { // NIFTY
+      minPInput.value = isNextWeek ? 69 : 60;
+      maxPInput.value = isNextWeek ? 96 : 70;
+    } else if (underlying === '25') { // BANK NIFTY
+      minPInput.value = isNextWeek ? 200 : 150;
+      maxPInput.value = isNextWeek ? 280 : 180;
+    } else if (underlying === '27') { // FIN NIFTY
+      minPInput.value = isNextWeek ? 90 : 70;
+      maxPInput.value = isNextWeek ? 130 : 90;
+    } else if (underlying === '17') { // SENSEX
+      minPInput.value = isNextWeek ? 100 : 70;
+      maxPInput.value = isNextWeek ? 150 : 120;
     }
   });
 
@@ -4007,6 +4074,47 @@ http.createServer((req, res) =&gt; {
   let lastCockpitAlertState = false;
   let lastCockpitAlertContract = '';
 
+  function autoTriggerSystematicTrade(preset, strike, optType, ltp) {
+    const symbol = `${preset.toUpperCase()} ${strike}`;
+    
+    // Check if we already have an active position for this contract
+    const hasActive = paperPortfolio.positions.some(pos => pos.symbol === symbol && pos.type === optType);
+    if (hasActive) return;
+
+    // Check if we already traded this contract today to prevent double trading
+    const todayKey = new Date().toISOString().slice(0, 10) + `_${symbol}_${optType}`;
+    if (localStorage.getItem('last_auto_trade_key') === todayKey) return;
+
+    // Determine lot size
+    let lotSize = 75; // Nifty default
+    if (preset === 'banknifty') lotSize = 15;
+    if (preset === 'finnifty') lotSize = 40;
+    if (preset === 'sensex') lotSize = 10;
+
+    // Calculate SL (20%) and Target (30% for 1:1.5 Risk-Reward)
+    const slPrice = Math.round(ltp * 0.80 * 10) / 10;
+    const targetPrice = Math.round(ltp * 1.30 * 10) / 10;
+
+    // Enter paper trade
+    paperPortfolio.positions.push({
+      symbol: symbol,
+      type: optType,
+      qty: lotSize,
+      entryPrice: ltp,
+      ltp: ltp,
+      slPrice: slPrice,
+      targetPrice: targetPrice,
+      secId: String(document.getElementById('cockpitSecId')?.value || '')
+    });
+
+    savePaperPortfolio();
+    renderPaperTrading();
+    localStorage.setItem('last_auto_trade_key', todayKey);
+
+    // Send Alert (Forwarded automatically to email alerts as well)
+    sendTelegramAlert(`🤖 *System Auto-Trade Initiated*\n*Asset*: ${symbol} ${optType}\n*Quantity*: ${lotSize}\n*Entry Price*: ₹${ltp.toFixed(2)}\n*Stop Loss*: ₹${slPrice.toFixed(2)} (20%)\n*Target*: ₹${targetPrice.toFixed(2)} (30% / RR 1:1.5)\nAll systematic rules matched automatically!`, false, 'paper');
+  }
+
   function evaluateCockpitRules() {
     const now = new Date();
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
@@ -4058,9 +4166,154 @@ http.createServer((req, res) =&gt; {
 
     const pcr = parseFloat(cockpitPcr.value) || 1.0;
     const optType = cockpitOptType.value;
-    const strike = parseFloat(cockpitStrike.value) || 0;
+    let strike = parseFloat(cockpitStrike.value) || 0;
     const preset = cockpitPreset.value;
     let isPcrOk = false;
+
+    // Calculate and update Cockpit Expiry and Delta displays
+    const expiryStr = document.getElementById('scanExpiry').value;
+    
+    function getDaysToExpiryDate(expStr) {
+      if (!expStr) {
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const istTime = new Date(utc + (3600000 * 5.5)); // UTC+5.5
+        const currentDay = istTime.getDay();
+        
+        let expiryDay = 2; // Tuesday default (Nifty & Fin Nifty)
+        if (preset === 'banknifty') expiryDay = 3; // Wednesday
+        if (preset === 'sensex') expiryDay = 5; // Friday
+        
+        if (currentDay === expiryDay) return 11; // next week weekly
+        return 4; // current week weekly
+      }
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const istTime = new Date(utc + (3600000 * 5.5)); // UTC+5.5
+      istTime.setHours(0, 0, 0, 0);
+      
+      const expDate = new Date(expStr);
+      expDate.setHours(0, 0, 0, 0);
+      
+      const diffMs = expDate.getTime() - istTime.getTime();
+      return Math.max(0.1, Math.round(diffMs / (1000 * 60 * 60 * 24)));
+    }
+
+    const days = getDaysToExpiryDate(expiryStr);
+    const spot = lastFetchedSpot || (preset === 'banknifty' ? 52500 : (preset === 'sensex' ? 80000 : (preset === 'finnifty' ? 24000 : 24400)));
+    const t = days / 365;
+    const r = 0.07;
+    const iv = preset === 'banknifty' ? 0.18 : (preset === 'sensex' ? 0.14 : (preset === 'finnifty' ? 0.16 : 0.15));
+
+    // Auto-Select Strike based on Delta Sweet Spot (0.30 - 0.35)
+    const autoDeltaCheck = document.getElementById('cockpitAutoDeltaStrike');
+    if (autoDeltaCheck && autoDeltaCheck.checked) {
+      let step = 50;
+      if (preset === 'banknifty' || preset === 'sensex') step = 100;
+      const atm = Math.round(spot / step) * step;
+      let bestStrike = atm;
+      let closestDiff = 999;
+      
+      for (let i = 0; i <= 15; i++) {
+        const testStrike = optType === 'CE' ? (atm + i * step) : (atm - i * step);
+        const testPrice = blackScholes(optType === 'CE', spot, testStrike, t, r, iv);
+        const testDelta = Math.abs(testPrice.delta);
+        const diff = Math.abs(testDelta - 0.325);
+        if (diff < closestDiff) {
+          closestDiff = diff;
+          bestStrike = testStrike;
+        }
+      }
+      
+      if (strike !== bestStrike) {
+        cockpitStrike.value = bestStrike;
+        strike = bestStrike;
+      }
+    }
+
+    const bsPrice = blackScholes(optType === 'CE', spot, strike, t, r, iv);
+    let deltaVal = Math.abs(bsPrice.delta);
+
+    const expiryDisplay = document.getElementById('cockpitExpiryDisplay');
+    const deltaDisplay = document.getElementById('cockpitDeltaDisplay');
+    const secIdDisplay = document.getElementById('cockpitSecIdDisplay');
+    
+    if (expiryDisplay) {
+      if (expiryStr) {
+        expiryDisplay.textContent = expiryStr;
+      } else {
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const istTime = new Date(utc + (3600000 * 5.5)); // UTC+5.5
+        const currentDay = istTime.getDay();
+        
+        let expiryDay = 2; // Tuesday default
+        if (preset === 'banknifty') expiryDay = 3;
+        if (preset === 'sensex') expiryDay = 5;
+        
+        if (currentDay === expiryDay) {
+          expiryDisplay.textContent = 'Next Week (Auto-Expiry)';
+        } else {
+          expiryDisplay.textContent = 'Current Week';
+        }
+      }
+    }
+    const deltaHint = document.getElementById('cockpitDeltaHint');
+    if (deltaDisplay) {
+      const isSweet = deltaVal >= 0.30 && deltaVal <= 0.35;
+      deltaDisplay.textContent = `${deltaVal.toFixed(2)} (${isSweet ? 'SWEET SPOT ✅' : 'OUTSIDE RANGE ⚠️'})`;
+      deltaDisplay.style.color = isSweet ? 'var(--green)' : 'var(--amber)';
+      
+      if (deltaHint) {
+        if (isSweet) {
+          deltaHint.innerHTML = `<span style="color:var(--green); font-weight:600;">Perfect! Strike conforms to the strategy's sweet spot rule.</span>`;
+        } else {
+          let step = 50;
+          if (preset === 'banknifty' || preset === 'sensex') step = 100;
+          const atm = Math.round(spot / step) * step;
+          let bestStrike = atm;
+          let closestDiff = 999;
+          
+          for (let i = 0; i <= 15; i++) {
+            const testStrike = optType === 'CE' ? (atm + i * step) : (atm - i * step);
+            const testPrice = blackScholes(optType === 'CE', spot, testStrike, t, r, iv);
+            const testDelta = Math.abs(testPrice.delta);
+            const diff = Math.abs(testDelta - 0.325); // Target center of the range (0.325)
+            if (diff < closestDiff) {
+              closestDiff = diff;
+              bestStrike = testStrike;
+            }
+          }
+          const bestPrice = blackScholes(optType === 'CE', spot, bestStrike, t, r, iv);
+          const bestDeltaVal = Math.abs(bestPrice.delta);
+          deltaHint.innerHTML = `⚠️ Outside optimal range. 💡 <strong>Try Strike ${bestStrike}</strong> (Est. Delta: ${bestDeltaVal.toFixed(2)}) based on Spot ₹${Math.round(spot)}`;
+        }
+      }
+    }
+
+    // Attempt to resolve secId from active scan rows
+    const rows = Array.from(document.querySelectorAll('#scanTableBody tr'));
+    let resolvedSecId = '';
+    rows.forEach(tr => {
+      const rowStrike = parseFloat(tr.querySelector('.s-strike').value);
+      if (rowStrike === strike) {
+        if (optType === 'CE' && tr.dataset.ceSecId) resolvedSecId = tr.dataset.ceSecId;
+        if (optType === 'PE' && tr.dataset.peSecId) resolvedSecId = tr.dataset.peSecId;
+      }
+    });
+    if (secIdDisplay) secIdDisplay.textContent = resolvedSecId || 'Manual Setup';
+    const hiddenSecIdInput = document.getElementById('cockpitSecId');
+    if (hiddenSecIdInput) hiddenSecIdInput.value = resolvedSecId || '';
+
+    // Update active position price if one matches the cockpit contract
+    const activeSymbol = `${preset.toUpperCase()} ${strike}`;
+    const activePos = paperPortfolio.positions.find(pos => pos.symbol === activeSymbol && pos.type === optType);
+    if (activePos) {
+      activePos.ltp = ltp;
+      savePaperPortfolio();
+      renderPaperTrading();
+      checkPaperTriggers();
+    }
     
     if (optType === 'CE') {
       isPcrOk = pcr >= 1.25;
@@ -4106,6 +4359,9 @@ http.createServer((req, res) =&gt; {
         lastCockpitAlertState = true;
         lastCockpitAlertContract = currentContractKey;
         sendTelegramAlert(`🚀 *OptionPulse Entry Trigger Met*\n*Action*: BUY ${optType}\n*Asset*: ${preset.toUpperCase()} Strike ${strike}\n*Option Premium*: ₹${ltp.toFixed(1)} (VWAP: ₹${vwap.toFixed(1)})\n*Market PCR*: ${pcr.toFixed(2)}\n*Market Time*: ${clockStr}\nReady to execute on your dashboard!`, false, 'checklist');
+        
+        // Trigger automated paper trading and daily log initiation!
+        autoTriggerSystematicTrade(preset, strike, optType, ltp);
       }
     } else {
       lastCockpitAlertState = false;
@@ -4209,6 +4465,7 @@ http.createServer((req, res) =&gt; {
 
   function syncCockpitStrikeToATM() {
     const preset = cockpitPreset.value;
+    const optType = cockpitOptType.value;
     const spot = lastFetchedSpot;
     
     let step = 50;
@@ -4228,17 +4485,68 @@ http.createServer((req, res) =&gt; {
       defaultStrike = 24400;
     }
 
-    if (spot > 0) {
-      cockpitStrike.value = Math.round(spot / step) * step;
+    const autoDeltaCheck = document.getElementById('cockpitAutoDeltaStrike');
+    if (autoDeltaCheck && autoDeltaCheck.checked) {
+      const activeSpot = spot > 0 ? spot : defaultStrike;
+      const expiryStr = document.getElementById('scanExpiry').value;
+      
+      function getDaysToExpiryDate(expStr) {
+        if (!expStr) {
+          const now = new Date();
+          const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+          const istTime = new Date(utc + (3600000 * 5.5)); // UTC+5.5
+          const currentDay = istTime.getDay();
+          
+          let expiryDay = 2; // Tuesday default
+          if (preset === 'banknifty') expiryDay = 3;
+          if (preset === 'sensex') expiryDay = 5;
+          
+          if (currentDay === expiryDay) return 11;
+          return 4;
+        }
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const istTime = new Date(utc + (3600000 * 5.5)); // UTC+5.5
+        istTime.setHours(0, 0, 0, 0);
+        const expDate = new Date(expStr);
+        expDate.setHours(0, 0, 0, 0);
+        const diffMs = expDate.getTime() - istTime.getTime();
+        return Math.max(0.1, Math.round(diffMs / (1000 * 60 * 60 * 24)));
+      }
+      
+      const days = getDaysToExpiryDate(expiryStr);
+      const t = days / 365;
+      const r = 0.07;
+      const iv = preset === 'banknifty' ? 0.18 : (preset === 'sensex' ? 0.14 : (preset === 'finnifty' ? 0.16 : 0.15));
+      
+      const atm = Math.round(activeSpot / step) * step;
+      let bestStrike = atm;
+      let closestDiff = 999;
+      
+      for (let i = 0; i <= 15; i++) {
+        const testStrike = optType === 'CE' ? (atm + i * step) : (atm - i * step);
+        const testPrice = blackScholes(optType === 'CE', activeSpot, testStrike, t, r, iv);
+        const testDelta = Math.abs(testPrice.delta);
+        const diff = Math.abs(testDelta - 0.325);
+        if (diff < closestDiff) {
+          closestDiff = diff;
+          bestStrike = testStrike;
+        }
+      }
+      cockpitStrike.value = bestStrike;
     } else {
-      cockpitStrike.value = defaultStrike;
+      if (spot > 0) {
+        cockpitStrike.value = Math.round(spot / step) * step;
+      } else {
+        cockpitStrike.value = defaultStrike;
+      }
     }
     evaluateCockpitRules();
   }
 
-  cockpitPreset.addEventListener('change', () => {
-    syncCockpitStrikeToATM();
-  });
+  cockpitPreset.addEventListener('change', syncCockpitStrikeToATM);
+  cockpitOptType.addEventListener('change', syncCockpitStrikeToATM);
+  document.getElementById('cockpitAutoDeltaStrike').addEventListener('change', syncCockpitStrikeToATM);
 
   function minutesToTimeStr(m) {
     const h = Math.floor(m / 60);
@@ -4845,6 +5153,14 @@ http.createServer((req, res) =&gt; {
   });
 
   function checkPaperTriggers() {
+    const now = new Date();
+    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const istTime = new Date(utc + (3600000 * 5.5)); // UTC+5.5
+    const hrs = istTime.getHours();
+    const mins = istTime.getMinutes();
+    const currentMin = hrs * 60 + mins;
+    const closeMin = 15 * 60 + 10; // 15:10 IST
+
     for (let i = paperPortfolio.positions.length - 1; i >= 0; i--) {
       const pos = paperPortfolio.positions[i];
       let closed = false;
@@ -4858,6 +5174,10 @@ http.createServer((req, res) =&gt; {
       } else if (pos.ltp >= pos.targetPrice) {
         exitPrice = pos.targetPrice;
         outcome = 'Target Profit Hit 🟢';
+        closed = true;
+      } else if (currentMin >= closeMin) {
+        exitPrice = pos.ltp;
+        outcome = 'Auto Square-off at 15:10 ⏰';
         closed = true;
       }
 
@@ -5557,6 +5877,17 @@ http.createServer((req, res) =&gt; {
         sec.classList.add('gated');
       });
     }
+
+    // Toggle Dhan API Connect display based on Owner role
+    const isOwner = currentUser && currentUser.isOwner;
+    const dhanSec = document.getElementById('dhanConnect');
+    const dhanLink = document.getElementById('navDhanLink');
+    if (dhanSec) {
+      dhanSec.style.display = isOwner ? 'block' : 'none';
+    }
+    if (dhanLink) {
+      dhanLink.style.display = isOwner ? 'block' : 'none';
+    }
   }
 
   function openAuthModal(mode = 'login') {
@@ -5613,15 +5944,7 @@ http.createServer((req, res) =&gt; {
     });
   }
 
-  const heroTrialBtn = document.getElementById('heroTrialBtn');
-  if (heroTrialBtn) {
-    heroTrialBtn.addEventListener('click', () => openAuthModal('register'));
-  }
 
-  const pricingTrialBtn = document.getElementById('pricingTrialBtn');
-  if (pricingTrialBtn) {
-    pricingTrialBtn.addEventListener('click', () => openAuthModal('register'));
-  }
 
   const authModalClose = document.getElementById('authModalClose');
   if (authModalClose) {
@@ -5706,6 +6029,48 @@ http.createServer((req, res) =&gt; {
     });
   }
 
+  // PRICING PLANS MODAL EVENT HANDLERS
+  const pricingModal = document.getElementById('pricingModal');
+  const navPricingBtn = document.getElementById('navPricingBtn');
+  if (navPricingBtn && pricingModal) {
+    navPricingBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      pricingModal.classList.remove('hidden-block');
+    });
+  }
+
+  const heroTrialBtn = document.getElementById('heroTrialBtn');
+  if (heroTrialBtn && pricingModal) {
+    heroTrialBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      pricingModal.classList.remove('hidden-block');
+    });
+  }
+
+  const pricingModalClose = document.getElementById('pricingModalClose');
+  if (pricingModalClose && pricingModal) {
+    pricingModalClose.addEventListener('click', () => {
+      pricingModal.classList.add('hidden-block');
+    });
+  }
+
+  const pricingModalLiteBtn = document.getElementById('pricingModalLiteBtn');
+  if (pricingModalLiteBtn && pricingModal) {
+    pricingModalLiteBtn.addEventListener('click', () => {
+      pricingModal.classList.add('hidden-block');
+      const target = document.getElementById('calculator');
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  const pricingModalProBtn = document.getElementById('pricingModalProBtn');
+  if (pricingModalProBtn && pricingModal) {
+    pricingModalProBtn.addEventListener('click', () => {
+      pricingModal.classList.add('hidden-block');
+      openAuthModal('register');
+    });
+  }
+
   // Star rating click logic
   const stars = document.querySelectorAll('#supportModal .star-rating');
   stars.forEach(star => {
@@ -5743,25 +6108,46 @@ http.createServer((req, res) =&gt; {
                       `• *Rating:* ${starEmoji} (${rating}/5)\n\n` +
                       `• *Comments:* "${comments}"`;
 
-    const tgToken = localStorage.getItem('tg_bot_token');
-    const tgChatId = localStorage.getItem('tg_chat_id');
-    
+    const { proxy } = getDhanCreds();
     let sentToTg = false;
-    if (tgToken && tgChatId) {
+
+    // 1. Try sending via backend proxy (if configured) so subscribers can relay to Owner securely
+    if (proxy) {
       try {
-        const url = `https://api.telegram.org/bot${tgToken}/sendMessage`;
-        const resp = await fetch(url, {
+        const base = proxy.replace(/\/$/, '');
+        const resp = await fetch(base + '/feedback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: tgChatId,
-            text: tgMessage,
-            parse_mode: 'Markdown'
-          })
+          body: JSON.stringify({ email, rating, comments })
         });
-        if (resp.ok) sentToTg = true;
+        if (resp.ok) {
+          sentToTg = true;
+        }
       } catch (err) {
-        console.warn('Could not forward feedback to Telegram:', err);
+        console.warn('Backend proxy feedback relay failed, falling back to local credentials:', err);
+      }
+    }
+
+    // 2. Fallback to client-side Telegram bot credentials if saved in browser
+    if (!sentToTg) {
+      const tgToken = localStorage.getItem('tg_bot_token');
+      const tgChatId = localStorage.getItem('tg_chat_id');
+      if (tgToken && tgChatId) {
+        try {
+          const url = `https://api.telegram.org/bot${tgToken}/sendMessage`;
+          const resp = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: tgChatId,
+              text: tgMessage,
+              parse_mode: 'Markdown'
+            })
+          });
+          if (resp.ok) sentToTg = true;
+        } catch (err) {
+          console.warn('Could not forward feedback to Telegram:', err);
+        }
       }
     }
 
