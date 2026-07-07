@@ -997,6 +997,33 @@
   </div>
 </nav>
 
+<!-- TOP PANEL INDEX TICKERS -->
+<div id="indexTickersBar" style="background:var(--bg-2); border-bottom:1px solid var(--border); display:flex; justify-content:center; align-items:center; gap:24px; padding:8px 16px; font-family:'JetBrains Mono', monospace; font-size:0.8rem; overflow-x:auto; white-space:nowrap; position:sticky; top:65px; z-index:99;">
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="color:var(--text-dim);">NIFTY 50:</span>
+    <span style="color:var(--text); font-weight:700;" id="tickerNifty">₹24,400.00</span>
+    <span style="color:var(--green); font-size:0.72rem;" id="changeNifty">+0.00%</span>
+  </div>
+  <div style="border-left: 1px solid var(--border); height: 12px;"></div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="color:var(--text-dim);">BANK NIFTY:</span>
+    <span style="color:var(--text); font-weight:700;" id="tickerBanknifty">₹52,500.00</span>
+    <span style="color:var(--green); font-size:0.72rem;" id="changeBanknifty">+0.00%</span>
+  </div>
+  <div style="border-left: 1px solid var(--border); height: 12px;"></div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="color:var(--text-dim);">FIN NIFTY:</span>
+    <span style="color:var(--text); font-weight:700;" id="tickerFinnifty">₹24,000.00</span>
+    <span style="color:var(--green); font-size:0.72rem;" id="changeFinnifty">+0.00%</span>
+  </div>
+  <div style="border-left: 1px solid var(--border); height: 12px;"></div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <span style="color:var(--text-dim);">SENSEX:</span>
+    <span style="color:var(--text); font-weight:700;" id="tickerSensex">₹80,000.00</span>
+    <span style="color:var(--green); font-size:0.72rem;" id="changeSensex">+0.00%</span>
+  </div>
+</div>
+
 <main id="top">
 
   <!-- HERO -->
@@ -1975,6 +2002,47 @@ http.createServer((req, res) =&gt; {
         ❌ Waiting for Live Status Scan...
         <span class="detail">Enter your values above or click Fetch Live Status to evaluate the core systematic trade conditions.</span>
       </div>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:18px; margin-top:22px;">
+        <!-- Option Premium & VWAP Chart -->
+        <div class="chart-wrap" style="padding:14px; position:relative; background:var(--bg-1); border:1px solid var(--border); border-radius:12px;">
+          <h4 style="font-size:0.9rem; margin:0 0 10px 0; color:var(--accent); display:flex; justify-content:space-between; align-items:center;">
+            Option Premium vs. VWAP Pullback
+            <span style="font-size:0.75rem; color:var(--text-dim); font-family:monospace;" id="optChartStats">LTP: — | VWAP: —</span>
+          </h4>
+          <div style="height:200px; position:relative;">
+            <svg id="cockpitPremiumChart" viewBox="0 0 500 200" preserveAspectRatio="none" style="width:100%; height:100%; overflow:visible;"></svg>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-dim); margin-top:8px;">
+            <span id="optChartStart">11:00 AM</span>
+            <span>VWAP Pullback Zone (LTP <= 101.5% of VWAP)</span>
+            <span id="optChartEnd">Now</span>
+          </div>
+        </div>
+
+        <!-- Index Spot Chart -->
+        <div class="chart-wrap" style="padding:14px; position:relative; background:var(--bg-1); border:1px solid var(--border); border-radius:12px;">
+          <h4 style="font-size:0.9rem; margin:0 0 10px 0; color:var(--accent); display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            Underlying Index Spot Track
+            <div style="display:flex; align-items:center; gap:6px;">
+              <select id="indexChartSelect" style="font-size:0.75rem; padding:2px 6px; border-radius:4px; height:24px; width:110px; margin:0; background:var(--bg-2); border:1px solid var(--border); color:var(--text);">
+                <option value="nifty" selected>NIFTY 50</option>
+                <option value="banknifty">BANK NIFTY</option>
+                <option value="finnifty">FIN NIFTY</option>
+                <option value="sensex">SENSEX</option>
+              </select>
+            </div>
+          </h4>
+          <div style="height:200px; position:relative;">
+            <svg id="cockpitIndexChart" viewBox="0 0 500 200" preserveAspectRatio="none" style="width:100%; height:100%; overflow:visible;"></svg>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-dim); margin-top:8px;">
+            <span id="idxChartStart">Today</span>
+            <span id="idxChartStats" style="font-weight:600;">Spot: —</span>
+            <span id="idxChartEnd">Now</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -2457,6 +2525,25 @@ http.createServer((req, res) =&gt; {
     const d = 0.39894228 * Math.exp(-x * x / 2);
     const p = d * t * (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
     return x >= 0 ? 1 - p : p;
+  }
+
+  function solveIV(isCall, S, K, T, r, targetPrice) {
+    if (targetPrice <= 0.05) return 0.15; // default fallback
+    let low = 0.01;
+    let high = 2.0;
+    for (let i = 0; i < 20; i++) {
+      const mid = (low + high) / 2;
+      const price = blackScholes(isCall, S, K, T, r, mid).price;
+      if (Math.abs(price - targetPrice) < 0.05) {
+        return mid;
+      }
+      if (price > targetPrice) {
+        high = mid;
+      } else {
+        low = mid;
+      }
+    }
+    return (low + high) / 2;
   }
 
   function blackScholes(isCall, S, K, T, r, v) {
@@ -3740,9 +3827,19 @@ http.createServer((req, res) =&gt; {
     tr.innerHTML = `
       <td style="text-align:center;"><button class="btn btn-ghost btn-sm" style="color:var(--green); border-color:var(--green); padding:4px 8px; font-size:.76rem;" onclick="openOrderTicket('${id}', 'CE')">Buy CE</button></td>
       <td><input type="number" class="s-strike" value="${strike}" step="50" style="text-align:center; font-weight:600;"></td>
-      <td><input type="number" class="s-ceLtp" value="${ceLtp}" step="1"></td>
+      <td>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <input type="number" class="s-ceLtp" value="${ceLtp}" step="0.1">
+          <span class="s-ceDelta" style="font-size:0.68rem; color:var(--text-dim); text-align:right; font-family:monospace; padding-right:4px;">Δ: —</span>
+        </div>
+      </td>
       <td><input type="number" class="s-ceOi" value="${ceOi}" step="1000"></td>
-      <td><input type="number" class="s-peLtp" value="${peLtp}" step="1"></td>
+      <td>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <input type="number" class="s-peLtp" value="${peLtp}" step="0.1">
+          <span class="s-peDelta" style="font-size:0.68rem; color:var(--text-dim); text-align:left; font-family:monospace; padding-left:4px;">Δ: —</span>
+        </div>
+      </td>
       <td><input type="number" class="s-peOi" value="${peOi}" step="1000"></td>
       <td style="text-align:center;"><button class="btn btn-ghost btn-sm" style="color:var(--green); border-color:var(--green); padding:4px 8px; font-size:.76rem;" onclick="openOrderTicket('${id}', 'PE')">Buy PE</button></td>
       <td><button class="btn btn-ghost btn-sm" style="padding:6px 10px;" onclick="this.closest('tr').remove()">✕</button></td>
@@ -3928,6 +4025,41 @@ http.createServer((req, res) =&gt; {
   function scanChain() {
     const rows = Array.from(scanTableBody.querySelectorAll('tr'));
     let totalCeOi = 0, totalPeOi = 0;
+
+    const expiryStr = document.getElementById('scanExpiry').value;
+    const preset = document.getElementById('scanUnderlying').value === '25' ? 'banknifty' : 
+                   (document.getElementById('scanUnderlying').value === '27' ? 'finnifty' : 
+                   (document.getElementById('scanUnderlying').value === '17' ? 'sensex' : 'nifty'));
+    
+    function getDaysToExpiryDate(expStr) {
+      if (!expStr) {
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const istTime = new Date(utc + (3600000 * 5.5));
+        const currentDay = istTime.getDay();
+        
+        let expiryDay = 2; // Tuesday default
+        if (preset === 'banknifty') expiryDay = 3;
+        if (preset === 'sensex') expiryDay = 5;
+        
+        if (currentDay === expiryDay) return 11;
+        return 4;
+      }
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const istTime = new Date(utc + (3600000 * 5.5));
+      istTime.setHours(0, 0, 0, 0);
+      const expDate = new Date(expStr);
+      expDate.setHours(0, 0, 0, 0);
+      const diffMs = expDate.getTime() - istTime.getTime();
+      return Math.max(0.1, Math.round(diffMs / (1000 * 60 * 60 * 24)));
+    }
+    
+    const days = getDaysToExpiryDate(expiryStr);
+    const spot = lastFetchedSpot || (preset === 'banknifty' ? 52500 : (preset === 'sensex' ? 80000 : (preset === 'finnifty' ? 24000 : 24400)));
+    const t = days / 365;
+    const r = 0.07;
+
     const parsed = rows.map(tr => {
       const strike = parseFloat(tr.querySelector('.s-strike').value) || 0;
       const ceLtp = parseFloat(tr.querySelector('.s-ceLtp').value) || 0;
@@ -3936,6 +4068,36 @@ http.createServer((req, res) =&gt; {
       const peOi = parseFloat(tr.querySelector('.s-peOi').value) || 0;
       totalCeOi += ceOi;
       totalPeOi += peOi;
+
+      // Calculate Delta dynamically from Solved IV
+      let ceDeltaVal = 0;
+      let peDeltaVal = 0;
+
+      if (ceLtp > 0 && spot > 0) {
+        const solvedCeIv = solveIV(true, spot, strike, t, r, ceLtp);
+        const ceBs = blackScholes(true, spot, strike, t, r, solvedCeIv);
+        ceDeltaVal = ceBs.delta;
+        const ceDeltaEl = tr.querySelector('.s-ceDelta');
+        if (ceDeltaEl) {
+          ceDeltaEl.textContent = `Δ: ${ceDeltaVal.toFixed(2)}`;
+          const isCeSweet = ceDeltaVal >= 0.30 && ceDeltaVal <= 0.35;
+          ceDeltaEl.style.color = isCeSweet ? 'var(--green)' : 'var(--text-dim)';
+          ceDeltaEl.style.fontWeight = isCeSweet ? 'bold' : 'normal';
+        }
+      }
+      
+      if (peLtp > 0 && spot > 0) {
+        const solvedPeIv = solveIV(false, spot, strike, t, r, peLtp);
+        const peBs = blackScholes(false, spot, strike, t, r, solvedPeIv);
+        peDeltaVal = Math.abs(peBs.delta);
+        const peDeltaEl = tr.querySelector('.s-peDelta');
+        if (peDeltaEl) {
+          peDeltaEl.textContent = `Δ: ${peDeltaVal.toFixed(2)}`;
+          const isPeSweet = peDeltaVal >= 0.30 && peDeltaVal <= 0.35;
+          peDeltaEl.style.color = isPeSweet ? 'var(--green)' : 'var(--text-dim)';
+          peDeltaEl.style.fontWeight = isPeSweet ? 'bold' : 'normal';
+        }
+      }
 
       // Auto scale targets: read from calculator fields, fallback Nifty = 50-80, Bank Nifty = 150-180
       const isBankNifty = strike > 30000;
@@ -4115,6 +4277,301 @@ http.createServer((req, res) =&gt; {
     sendTelegramAlert(`🤖 *System Auto-Trade Initiated*\n*Asset*: ${symbol} ${optType}\n*Quantity*: ${lotSize}\n*Entry Price*: ₹${ltp.toFixed(2)}\n*Stop Loss*: ₹${slPrice.toFixed(2)} (20%)\n*Target*: ₹${targetPrice.toFixed(2)} (30% / RR 1:1.5)\nAll systematic rules matched automatically!`, false, 'paper');
   }
 
+  let premiumChartData = [];
+  let lastChartContractKey = '';
+  let indexChartData = {
+    nifty: [],
+    banknifty: [],
+    finnifty: [],
+    sensex: []
+  };
+
+  function drawSvgLineChart(svgId, points, key1, key2) {
+    const svg = document.getElementById(svgId);
+    if (!svg) return;
+    svg.innerHTML = '';
+    
+    if (!points || points.length < 2) {
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', '250');
+      text.setAttribute('y', '100');
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('fill', 'var(--text-dim)');
+      text.setAttribute('font-size', '14');
+      text.textContent = 'Waiting for live price updates…';
+      svg.appendChild(text);
+      return;
+    }
+    
+    let allVals = [];
+    points.forEach(p => {
+      if (p[key1] !== undefined && !isNaN(p[key1])) allVals.push(p[key1]);
+      if (key2 && p[key2] !== undefined && !isNaN(p[key2])) allVals.push(p[key2]);
+    });
+    
+    if (!allVals.length) allVals = [100, 105];
+    
+    const minVal = Math.min(...allVals) * 0.998;
+    const maxVal = Math.max(...allVals) * 1.002;
+    const valRange = maxVal - minVal;
+    
+    const width = 500;
+    const height = 200;
+    const padLeft = 55;
+    const padRight = 10;
+    const padTop = 15;
+    const padBot = 15;
+    
+    const graphWidth = width - padLeft - padRight;
+    const graphHeight = height - padTop - padBot;
+    
+    function getX(index) {
+      return padLeft + (index / (points.length - 1)) * graphWidth;
+    }
+    function getY(val) {
+      if (valRange === 0) return padTop + graphHeight / 2;
+      return padTop + graphHeight - ((val - minVal) / valRange) * graphHeight;
+    }
+    
+    for (let i = 0; i <= 2; i++) {
+      const yVal = minVal + (i / 2) * valRange;
+      const yPos = getY(yVal);
+      
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', String(padLeft));
+      line.setAttribute('y1', String(yPos));
+      line.setAttribute('x2', String(width - padRight));
+      line.setAttribute('y2', String(yPos));
+      line.setAttribute('stroke', 'var(--border)');
+      line.setAttribute('stroke-dasharray', '3,3');
+      line.setAttribute('stroke-width', '1');
+      svg.appendChild(line);
+      
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', String(padLeft - 6));
+      text.setAttribute('y', String(yPos + 4));
+      text.setAttribute('text-anchor', 'end');
+      text.setAttribute('fill', 'var(--text-dim)');
+      text.setAttribute('font-size', '9');
+      text.setAttribute('font-family', 'monospace');
+      text.textContent = '₹' + Math.round(yVal).toLocaleString('en-IN');
+      svg.appendChild(text);
+    }
+    
+    function drawSeriesLine(key, color, glowColor, strokeWidth) {
+      let pathD = '';
+      points.forEach((p, idx) => {
+        const x = getX(idx);
+        const y = getY(p[key]);
+        if (idx === 0) pathD = `M ${x} ${y}`;
+        else pathD += ` L ${x} ${y}`;
+      });
+      
+      const glowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      glowPath.setAttribute('d', pathD);
+      glowPath.setAttribute('fill', 'none');
+      glowPath.setAttribute('stroke', glowColor);
+      glowPath.setAttribute('stroke-width', String(strokeWidth + 4));
+      glowPath.setAttribute('opacity', '0.2');
+      svg.appendChild(glowPath);
+      
+      const linePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      linePath.setAttribute('d', pathD);
+      linePath.setAttribute('fill', 'none');
+      linePath.setAttribute('stroke', color);
+      linePath.setAttribute('stroke-width', String(strokeWidth));
+      svg.appendChild(linePath);
+    }
+    
+    drawSeriesLine(key1, 'var(--accent)', 'rgba(56, 189, 248, 0.4)', 2.5);
+    if (key2) {
+      drawSeriesLine(key2, 'var(--amber)', 'rgba(245, 158, 11, 0.4)', 2);
+    }
+  }
+
+  function drawPremiumChart() {
+    drawSvgLineChart('cockpitPremiumChart', premiumChartData, 'ltp', 'vwap');
+    const last = premiumChartData[premiumChartData.length - 1];
+    if (last) {
+      document.getElementById('optChartStats').textContent = `LTP: ₹${last.ltp.toFixed(1)} | VWAP: ₹${last.vwap.toFixed(1)}`;
+    }
+  }
+
+  function drawIndexChart() {
+    const selIndex = document.getElementById('indexChartSelect').value;
+    const history = indexChartData[selIndex] || [];
+    drawSvgLineChart('cockpitIndexChart', history, 'spot');
+    const last = history[history.length - 1];
+    if (last) {
+      document.getElementById('idxChartStats').textContent = `Spot: ₹${last.spot.toLocaleString('en-IN', { minimumFractionDigits: 1 })}`;
+    }
+  }
+
+  async function loadIndexHistoricalChart(presetName) {
+    const symbols = {
+      nifty: '^NSEI',
+      banknifty: '^NSEBANK',
+      finnifty: 'NIFTY_FIN_SERVICE.NS',
+      sensex: '^BSESN'
+    };
+    const symbol = symbols[presetName] || '^NSEI';
+    try {
+      const proxy = localStorage.getItem('dhan_proxy') || '';
+      let url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(symbol) + '?interval=5m&range=1d';
+      if (proxy) {
+        url = proxy.replace(/\/$/, '') + '/yahoo/v8/finance/chart/' + encodeURIComponent(symbol) + '?interval=5m&range=1d';
+      }
+      
+      const res = await fetch(url);
+      const json = await res.json();
+      const result = json.chart && json.chart.result && json.chart.result[0];
+      if (result && result.indicators && result.indicators.quote && result.indicators.quote[0]) {
+        const quotes = result.indicators.quote[0];
+        const timestamps = result.timestamp || [];
+        const closes = quotes.close || [];
+        
+        const history = [];
+        for (let i = 0; i < timestamps.length; i++) {
+          if (timestamps[i] && closes[i]) {
+            history.push({
+              timestamp: timestamps[i] * 1000,
+              spot: closes[i]
+            });
+          }
+        }
+        
+        indexChartData[presetName] = history;
+        drawIndexChart();
+      }
+    } catch(e) {
+      console.warn(`Could not load historical index chart for ${presetName}:`, e.message);
+    }
+  }
+
+  let indexSpotPrices = { nifty: 24400, banknifty: 52500, finnifty: 24000, sensex: 80000 };
+  let indexChangePercentages = { nifty: 0, banknifty: 0, finnifty: 0, sensex: 0 };
+
+  async function fetchTickerPrices() {
+    const symbols = {
+      nifty: '^NSEI',
+      banknifty: '^NSEBANK',
+      finnifty: 'NIFTY_FIN_SERVICE.NS',
+      sensex: '^BSESN'
+    };
+
+    const keys = Object.keys(symbols);
+    for (const key of keys) {
+      try {
+        const symbol = symbols[key];
+        const { token, clientId } = getDhanCreds();
+        let price = 0;
+        let prevClose = 0;
+
+        if (token && clientId) {
+          let scripId = 13;
+          if (key === 'banknifty') scripId = 25;
+          if (key === 'finnifty') scripId = 27;
+          if (key === 'sensex') scripId = 17;
+          
+          try {
+            const resp = await dhanRequest('/v2/charts/intraday', {
+              securityId: String(scripId),
+              exchangeSegment: 'IDX_I',
+              instrument: 'INDEX',
+              interval: '15',
+              oi: false,
+              fromDate: new Date().toISOString().slice(0, 10),
+              toDate: new Date().toISOString().slice(0, 10)
+            });
+            if (resp && resp.close && resp.close.length > 0) {
+              price = resp.close[resp.close.length - 1];
+              prevClose = resp.close[0];
+            }
+          } catch(e) {
+            console.warn(`Dhan ticker fetch failed for ${key}, falling back to Yahoo:`, e);
+          }
+        }
+
+        if (price === 0) {
+          const proxy = localStorage.getItem('dhan_proxy') || '';
+          let url = 'https://query1.finance.yahoo.com/v8/finance/chart/' + encodeURIComponent(symbol) + '?interval=1d&range=1d';
+          if (proxy) {
+            url = proxy.replace(/\/$/, '') + '/yahoo/v8/finance/chart/' + encodeURIComponent(symbol) + '?interval=1d&range=1d';
+          }
+          
+          const res = await fetch(url);
+          const json = await res.json();
+          const result = json.chart && json.chart.result && json.chart.result[0];
+          if (result && result.meta) {
+            price = result.meta.regularMarketPrice;
+            prevClose = result.meta.previousClose || price;
+          }
+        }
+
+        if (price > 0) {
+          indexSpotPrices[key] = price;
+          const changePercent = prevClose > 0 ? ((price - prevClose) / prevClose) * 100 : 0;
+          indexChangePercentages[key] = changePercent;
+          
+          if (key === cockpitPreset.value) {
+            lastFetchedSpot = price;
+          }
+        }
+      } catch (e) {
+        console.warn(`Failed to fetch live ticker for ${key}:`, e.message);
+      }
+    }
+    updateTickerUI();
+    
+    // Also append the new tick to the index history charts
+    const now = Date.now();
+    Object.keys(indexSpotPrices).forEach(key => {
+      const spotVal = indexSpotPrices[key];
+      const history = indexChartData[key] || [];
+      const lastPoint = history[history.length - 1];
+      if (!lastPoint || now - lastPoint.timestamp >= 30000) {
+        history.push({ timestamp: now, spot: spotVal });
+        if (history.length > 100) history.shift();
+      }
+    });
+    drawIndexChart();
+  }
+
+  function updateTickerUI() {
+    Object.keys(indexSpotPrices).forEach(key => {
+      const priceVal = indexSpotPrices[key];
+      const changeVal = indexChangePercentages[key];
+      
+      const priceEl = document.getElementById(`ticker${key.charAt(0).toUpperCase() + key.slice(1)}`);
+      const changeEl = document.getElementById(`change${key.charAt(0).toUpperCase() + key.slice(1)}`);
+      
+      if (priceEl) {
+        priceEl.textContent = `₹${priceVal.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+      
+      if (changeEl) {
+        const sign = changeVal >= 0 ? '+' : '';
+        changeEl.textContent = `${sign}${changeVal.toFixed(2)}%`;
+        changeEl.style.color = changeVal >= 0 ? 'var(--green)' : 'var(--red)';
+      }
+    });
+  }
+
+  // Initialize index charts and ticker background loop
+  setTimeout(() => {
+    fetchTickerPrices();
+    ['nifty', 'banknifty', 'finnifty', 'sensex'].forEach(preset => {
+      loadIndexHistoricalChart(preset);
+    });
+  }, 1000);
+  setInterval(fetchTickerPrices, 30000);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('indexChartSelect').addEventListener('change', () => {
+      drawIndexChart();
+    });
+  });
+
   function evaluateCockpitRules() {
     const now = new Date();
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
@@ -4210,18 +4667,63 @@ http.createServer((req, res) =&gt; {
     if (autoDeltaCheck && autoDeltaCheck.checked) {
       let step = 50;
       if (preset === 'banknifty' || preset === 'sensex') step = 100;
-      const atm = Math.round(spot / step) * step;
-      let bestStrike = atm;
-      let closestDiff = 999;
       
-      for (let i = 0; i <= 15; i++) {
-        const testStrike = optType === 'CE' ? (atm + i * step) : (atm - i * step);
-        const testPrice = blackScholes(optType === 'CE', spot, testStrike, t, r, iv);
-        const testDelta = Math.abs(testPrice.delta);
-        const diff = Math.abs(testDelta - 0.325);
-        if (diff < closestDiff) {
-          closestDiff = diff;
-          bestStrike = testStrike;
+      // 1. Try to find the closest strike from the active live scanner rows first
+      const rows = Array.from(document.querySelectorAll('#scanTableBody tr'));
+      let bestStrike = 0;
+      let closestDiff = 999;
+
+      let tableSpotMatch = false;
+      if (rows.length > 0) {
+        const firstStrikeVal = parseFloat(rows[0].querySelector('.s-strike').value) || 0;
+        if (firstStrikeVal > 0 && Math.abs(firstStrikeVal - spot) / spot < 0.05) {
+          tableSpotMatch = true;
+        }
+      }
+
+      if (rows.length > 0 && tableSpotMatch) {
+        rows.forEach(tr => {
+          const rowStrike = parseFloat(tr.querySelector('.s-strike').value) || 0;
+          const ceLtp = parseFloat(tr.querySelector('.s-ceLtp').value) || 0;
+          const peLtp = parseFloat(tr.querySelector('.s-peLtp').value) || 0;
+
+          if (rowStrike > 0) {
+            let rowDelta = 0;
+            if (optType === 'CE' && ceLtp > 0) {
+              const solvedCeIv = solveIV(true, spot, rowStrike, t, r, ceLtp);
+              rowDelta = blackScholes(true, spot, rowStrike, t, r, solvedCeIv).delta;
+            } else if (optType === 'PE' && peLtp > 0) {
+              const solvedPeIv = solveIV(false, spot, rowStrike, t, r, peLtp);
+              rowDelta = Math.abs(blackScholes(false, spot, rowStrike, t, r, solvedPeIv).delta);
+            }
+
+            if (rowDelta > 0) {
+              const diff = Math.abs(rowDelta - 0.32);
+              if (diff < closestDiff) {
+                closestDiff = diff;
+                bestStrike = rowStrike;
+              }
+            }
+          }
+        });
+      }
+
+      // 2. Fall back to Black-Scholes theoretical calculation if no scanner rows exist
+      if (bestStrike === 0) {
+        const solvedIv = solveIV(optType === 'CE', spot, strike, t, r, ltp);
+        const atm = Math.round(spot / step) * step;
+        bestStrike = atm;
+        closestDiff = 999;
+        
+        for (let i = 0; i <= 15; i++) {
+          const testStrike = optType === 'CE' ? (atm + i * step) : (atm - i * step);
+          const testPrice = blackScholes(optType === 'CE', spot, testStrike, t, r, solvedIv);
+          const testDelta = Math.abs(testPrice.delta);
+          const diff = Math.abs(testDelta - 0.32);
+          if (diff < closestDiff) {
+            closestDiff = diff;
+            bestStrike = testStrike;
+          }
         }
       }
       
@@ -4231,7 +4733,8 @@ http.createServer((req, res) =&gt; {
       }
     }
 
-    const bsPrice = blackScholes(optType === 'CE', spot, strike, t, r, iv);
+    const solvedIv = solveIV(optType === 'CE', spot, strike, t, r, ltp);
+    const bsPrice = blackScholes(optType === 'CE', spot, strike, t, r, solvedIv);
     let deltaVal = Math.abs(bsPrice.delta);
 
     const expiryDisplay = document.getElementById('cockpitExpiryDisplay');
@@ -4313,6 +4816,23 @@ http.createServer((req, res) =&gt; {
       savePaperPortfolio();
       renderPaperTrading();
       checkPaperTriggers();
+    }
+    
+    // Update premium history chart
+    const currentContractKey = `${preset}_${strike}_${optType}`;
+    if (lastChartContractKey !== currentContractKey) {
+      premiumChartData = [];
+      lastChartContractKey = currentContractKey;
+    }
+    
+    if (ltp > 0 && vwap > 0) {
+      const now = Date.now();
+      const lastPoint = premiumChartData[premiumChartData.length - 1];
+      if (!lastPoint || now - lastPoint.timestamp >= 30000) {
+        premiumChartData.push({ timestamp: now, ltp: ltp, vwap: vwap });
+        if (premiumChartData.length > 50) premiumChartData.shift();
+        drawPremiumChart();
+      }
     }
     
     if (optType === 'CE') {
@@ -4517,20 +5037,63 @@ http.createServer((req, res) =&gt; {
       const days = getDaysToExpiryDate(expiryStr);
       const t = days / 365;
       const r = 0.07;
-      const iv = preset === 'banknifty' ? 0.18 : (preset === 'sensex' ? 0.14 : (preset === 'finnifty' ? 0.16 : 0.15));
-      
-      const atm = Math.round(activeSpot / step) * step;
-      let bestStrike = atm;
+      // 1. Try to find the closest strike from the active live scanner rows first
+      const rows = Array.from(document.querySelectorAll('#scanTableBody tr'));
+      let bestStrike = 0;
       let closestDiff = 999;
-      
-      for (let i = 0; i <= 15; i++) {
-        const testStrike = optType === 'CE' ? (atm + i * step) : (atm - i * step);
-        const testPrice = blackScholes(optType === 'CE', activeSpot, testStrike, t, r, iv);
-        const testDelta = Math.abs(testPrice.delta);
-        const diff = Math.abs(testDelta - 0.325);
-        if (diff < closestDiff) {
-          closestDiff = diff;
-          bestStrike = testStrike;
+
+      let tableSpotMatch = false;
+      if (rows.length > 0) {
+        const firstStrikeVal = parseFloat(rows[0].querySelector('.s-strike').value) || 0;
+        if (firstStrikeVal > 0 && Math.abs(firstStrikeVal - activeSpot) / activeSpot < 0.05) {
+          tableSpotMatch = true;
+        }
+      }
+
+      if (rows.length > 0 && tableSpotMatch) {
+        rows.forEach(tr => {
+          const rowStrike = parseFloat(tr.querySelector('.s-strike').value) || 0;
+          const ceLtp = parseFloat(tr.querySelector('.s-ceLtp').value) || 0;
+          const peLtp = parseFloat(tr.querySelector('.s-peLtp').value) || 0;
+
+          if (rowStrike > 0) {
+            let rowDelta = 0;
+            if (optType === 'CE' && ceLtp > 0) {
+              const solvedCeIv = solveIV(true, activeSpot, rowStrike, t, r, ceLtp);
+              rowDelta = blackScholes(true, activeSpot, rowStrike, t, r, solvedCeIv).delta;
+            } else if (optType === 'PE' && peLtp > 0) {
+              const solvedPeIv = solveIV(false, activeSpot, rowStrike, t, r, peLtp);
+              rowDelta = Math.abs(blackScholes(false, activeSpot, rowStrike, t, r, solvedPeIv).delta);
+            }
+
+            if (rowDelta > 0) {
+              const diff = Math.abs(rowDelta - 0.32);
+              if (diff < closestDiff) {
+                closestDiff = diff;
+                bestStrike = rowStrike;
+              }
+            }
+          }
+        });
+      }
+
+      // 2. Fall back to Black-Scholes theoretical calculation if no scanner rows exist
+      if (bestStrike === 0) {
+        const currentLtp = parseFloat(cockpitLtp.value) || 60;
+        const solvedIv = solveIV(optType === 'CE', activeSpot, defaultStrike, t, r, currentLtp);
+        const atm = Math.round(activeSpot / step) * step;
+        bestStrike = atm;
+        closestDiff = 999;
+        
+        for (let i = 0; i <= 15; i++) {
+          const testStrike = optType === 'CE' ? (atm + i * step) : (atm - i * step);
+          const testPrice = blackScholes(optType === 'CE', activeSpot, testStrike, t, r, solvedIv);
+          const testDelta = Math.abs(testPrice.delta);
+          const diff = Math.abs(testDelta - 0.32);
+          if (diff < closestDiff) {
+            closestDiff = diff;
+            bestStrike = testStrike;
+          }
         }
       }
       cockpitStrike.value = bestStrike;
