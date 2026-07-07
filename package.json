@@ -1,0 +1,8 @@
+{
+  "name": "dhan-proxy",
+  "version": "1.0.0",
+  "main": "dhan-proxy.js",
+  "scripts": {
+    "start": "node dhan-proxy.js"
+  }
+}
