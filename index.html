@@ -1915,7 +1915,7 @@ http.createServer((req, res) =&gt; {
             Fetch Live Status
           </button>
           <label style="display:inline-flex; align-items:center; gap:6px; font-size:.8rem; color:var(--text-dim); cursor:pointer; user-select:none;">
-            <input type="checkbox" id="cockpitAutoSync" style="width:13px; height:13px; cursor:pointer;"> Auto-Monitor Rules
+            <input type="checkbox" id="cockpitAutoSync" style="width:13px; height:13px; cursor:pointer;" checked> Auto-Monitor Rules
           </label>
         </div>
         <div id="cockpitMarketTime" style="font-family:'JetBrains Mono', monospace; font-size:.9rem; color:var(--text-dim);">Market Time: —</div>
@@ -2014,9 +2014,25 @@ http.createServer((req, res) =&gt; {
             <svg id="cockpitPremiumChart" viewBox="0 0 500 200" preserveAspectRatio="none" style="width:100%; height:100%; overflow:visible;"></svg>
           </div>
           <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-dim); margin-top:8px;">
-            <span id="optChartStart">11:00 AM</span>
-            <span>VWAP Pullback Zone (LTP <= 101.5% of VWAP)</span>
-            <span id="optChartEnd">Now</span>
+            <span>09:15 AM</span>
+            <span>VWAP Pullback (LTP <= 101.5% of VWAP)</span>
+            <span>03:30 PM</span>
+          </div>
+        </div>
+
+        <!-- Index PCR Trend Chart -->
+        <div class="chart-wrap" style="padding:14px; position:relative; background:var(--bg-1); border:1px solid var(--border); border-radius:12px;">
+          <h4 style="font-size:0.9rem; margin:0 0 10px 0; color:var(--accent); display:flex; justify-content:space-between; align-items:center;">
+            Index PCR Trend
+            <span style="font-size:0.75rem; color:var(--text-dim); font-family:monospace;" id="pcrChartStats">PCR: —</span>
+          </h4>
+          <div style="height:200px; position:relative;">
+            <svg id="cockpitPcrChart" viewBox="0 0 500 200" preserveAspectRatio="none" style="width:100%; height:100%; overflow:visible;"></svg>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-dim); margin-top:8px;">
+            <span>09:15 AM</span>
+            <span>Intraday PCR Bias</span>
+            <span>03:30 PM</span>
           </div>
         </div>
 
@@ -2037,9 +2053,9 @@ http.createServer((req, res) =&gt; {
             <svg id="cockpitIndexChart" viewBox="0 0 500 200" preserveAspectRatio="none" style="width:100%; height:100%; overflow:visible;"></svg>
           </div>
           <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-dim); margin-top:8px;">
-            <span id="idxChartStart">Today</span>
+            <span>09:15 AM</span>
             <span id="idxChartStats" style="font-weight:600;">Spot: —</span>
-            <span id="idxChartEnd">Now</span>
+            <span>03:30 PM</span>
           </div>
         </div>
       </div>
@@ -3817,6 +3833,8 @@ http.createServer((req, res) =&gt; {
   let scanRowId = 0;
   let lastFetchedSpot = null;
   const pcrHistory = [];
+  let lastPcrLogTime = 0;
+  let pcrChartData = [];
 
   function addScanRow(strike, ceLtp, ceOi, peLtp, peOi, ceSecId, peSecId) {
     const id = 'srow' + (scanRowId++);
@@ -4138,11 +4156,12 @@ http.createServer((req, res) =&gt; {
       </div>
     `;
 
-    // History Trend Logging
+    // History Trend Logging (15-minute interval)
     if (totalCeOi > 0 && totalPeOi > 0) {
-      const lastRecord = pcrHistory[pcrHistory.length - 1];
-      if (!lastRecord || lastRecord.callOi !== totalCeOi || lastRecord.putOi !== totalPeOi) {
+      const now = Date.now();
+      if (lastPcrLogTime === 0 || now - lastPcrLogTime >= 15 * 60 * 1000) {
         const timeStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const lastRecord = pcrHistory[pcrHistory.length - 1];
         const lastPcr = lastRecord ? lastRecord.pcr : null;
         let trend = '—';
         if (lastPcr !== null) {
@@ -4158,7 +4177,19 @@ http.createServer((req, res) =&gt; {
           pcr: pcr,
           trend: trend
         });
+        lastPcrLogTime = now;
         renderPcrHistory();
+      }
+    }
+
+    // Append to live PCR chart data
+    if (pcr > 0) {
+      const now = Date.now();
+      const lastPoint = pcrChartData[pcrChartData.length - 1];
+      if (!lastPoint || now - lastPoint.timestamp >= 30000) {
+        pcrChartData.push({ timestamp: now, pcr: pcr });
+        if (pcrChartData.length > 500) pcrChartData.shift();
+        drawPcrChart();
       }
     }
   }
@@ -4325,9 +4356,30 @@ http.createServer((req, res) =&gt; {
     const graphWidth = width - padLeft - padRight;
     const graphHeight = height - padTop - padBot;
     
-    function getX(index) {
+    function getMarketSessionX(timestamp) {
+      if (!timestamp) return 0;
+      const date = new Date(timestamp);
+      const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+      const istTime = new Date(utc + (3600000 * 5.5)); // UTC+5.5
+      const h = istTime.getHours();
+      const m = istTime.getMinutes();
+      const s = istTime.getSeconds();
+      const mins = h * 60 + m + s / 60;
+      
+      const startMins = 9 * 60 + 15; // 09:15 AM
+      const endMins = 15 * 60 + 30;  // 03:30 PM
+      const ratio = (mins - startMins) / (endMins - startMins);
+      return Math.max(0, Math.min(1, ratio));
+    }
+    
+    function getX(p, index) {
+      if (p && p.timestamp) {
+        const ratio = getMarketSessionX(p.timestamp);
+        return padLeft + ratio * graphWidth;
+      }
       return padLeft + (index / (points.length - 1)) * graphWidth;
     }
+    
     function getY(val) {
       if (valRange === 0) return padTop + graphHeight / 2;
       return padTop + graphHeight - ((val - minVal) / valRange) * graphHeight;
@@ -4354,14 +4406,21 @@ http.createServer((req, res) =&gt; {
       text.setAttribute('fill', 'var(--text-dim)');
       text.setAttribute('font-size', '9');
       text.setAttribute('font-family', 'monospace');
-      text.textContent = '₹' + Math.round(yVal).toLocaleString('en-IN');
+      
+      let formattedVal = '';
+      if (key1 === 'pcr') {
+        formattedVal = yVal.toFixed(2);
+      } else {
+        formattedVal = '₹' + Math.round(yVal).toLocaleString('en-IN');
+      }
+      text.textContent = formattedVal;
       svg.appendChild(text);
     }
     
     function drawSeriesLine(key, color, glowColor, strokeWidth) {
       let pathD = '';
       points.forEach((p, idx) => {
-        const x = getX(idx);
+        const x = getX(p, idx);
         const y = getY(p[key]);
         if (idx === 0) pathD = `M ${x} ${y}`;
         else pathD += ` L ${x} ${y}`;
@@ -4394,6 +4453,14 @@ http.createServer((req, res) =&gt; {
     const last = premiumChartData[premiumChartData.length - 1];
     if (last) {
       document.getElementById('optChartStats').textContent = `LTP: ₹${last.ltp.toFixed(1)} | VWAP: ₹${last.vwap.toFixed(1)}`;
+    }
+  }
+
+  function drawPcrChart() {
+    drawSvgLineChart('cockpitPcrChart', pcrChartData, 'pcr');
+    const last = pcrChartData[pcrChartData.length - 1];
+    if (last) {
+      document.getElementById('pcrChartStats').textContent = `PCR: ${last.pcr.toFixed(2)}`;
     }
   }
 
