@@ -1355,7 +1355,7 @@
 
       <div class="tool-field" style="margin-top:12px; margin-bottom:18px;">
         <label>Proxy Base URL (optional — only if direct calls get CORS-blocked)</label>
-        <input type="text" id="dhanProxy" placeholder="e.g. http://localhost:8787" value="http://localhost:8787">
+        <input type="text" id="dhanProxy" placeholder="e.g. https://optionpulse-xc50.onrender.com" value="https://optionpulse-xc50.onrender.com">
         <p style="color:var(--text-dim);font-size:.76rem;margin-top:6px;">Note: every time you download a new/updated version of this HTML file, you'll need to re-enter and re-save these fields — browsers don't share saved data between separate file downloads.</p>
       </div>
 
@@ -3014,10 +3014,18 @@ http.createServer((req, res) =&gt; {
 
   /* ===== Dhan API connection helper ===== */
   function getDhanCreds() {
+    const isOwner = currentUser && currentUser.isOwner;
+    if (!isOwner) {
+      return {
+        token: '',
+        clientId: '',
+        proxy: 'https://optionpulse-xc50.onrender.com'
+      };
+    }
     return {
       token: document.getElementById('dhanToken').value.trim() || localStorage.getItem('dhan_token') || '',
       clientId: document.getElementById('dhanClientId').value.trim() || localStorage.getItem('dhan_client_id') || '',
-      proxy: document.getElementById('dhanProxy').value.trim() || localStorage.getItem('dhan_proxy') || 'http://localhost:8787'
+      proxy: document.getElementById('dhanProxy').value.trim() || localStorage.getItem('dhan_proxy') || 'https://optionpulse-xc50.onrender.com'
     };
   }
 
@@ -3051,7 +3059,7 @@ http.createServer((req, res) =&gt; {
         }
         throw new Error('Proxy is reachable, but the request to Dhan failed — check the proxy\'s terminal window for the actual error (often an OPTIONS/preflight or network issue on that machine).');
       }
-      throw new Error('Network/CORS error calling Dhan directly from the browser (expected — Dhan\'s API isn\'t built for direct browser calls). Proxy Base URL field currently reads: "' + (document.getElementById('dhanProxy').value.trim() || '(empty)') + '". If that\'s empty, type http://localhost:8787 into it and click "Save in This Browser" — note that every time you download a new/updated copy of this file, saved credentials do NOT carry over automatically (browsers isolate storage per local file), so they need to be re-entered once per new file.');
+      throw new Error('Network/CORS error calling Dhan directly from the browser (expected — Dhan\'s API isn\'t built for direct browser calls). Proxy Base URL field currently reads: "' + (document.getElementById('dhanProxy').value.trim() || '(empty)') + '". If that\'s empty, type https://optionpulse-xc50.onrender.com into it and click "Save in This Browser" — note that every time you download a new/updated copy of this file, saved credentials do NOT carry over automatically (browsers isolate storage per local file), so they need to be re-entered once per new file.');
     }
     if (!res.ok) {
       let msg = res.status + ' ' + res.statusText;
@@ -3064,7 +3072,7 @@ http.createServer((req, res) =&gt; {
   function loadDhanCredsIntoFields() {
     const t = localStorage.getItem('dhan_token');
     const c = localStorage.getItem('dhan_client_id');
-    const p = localStorage.getItem('dhan_proxy') || 'http://localhost:8787';
+    const p = localStorage.getItem('dhan_proxy') || 'https://optionpulse-xc50.onrender.com';
     const pin = localStorage.getItem('dhan_pin') || '';
     const secret = localStorage.getItem('dhan_totp_secret') || '';
     
@@ -3107,7 +3115,7 @@ http.createServer((req, res) =&gt; {
     
     document.getElementById('dhanToken').value = '';
     document.getElementById('dhanClientId').value = '';
-    document.getElementById('dhanProxy').value = 'http://localhost:8787';
+    document.getElementById('dhanProxy').value = 'https://optionpulse-xc50.onrender.com';
     document.getElementById('dhanPin').value = '';
     document.getElementById('dhanTotpSecret').value = '';
     setDhanStatus('idle', 'Credentials cleared');
@@ -3117,7 +3125,7 @@ http.createServer((req, res) =&gt; {
     const clientId = document.getElementById('dhanClientId').value.trim();
     const pin = document.getElementById('dhanPin').value.trim();
     const secret = document.getElementById('dhanTotpSecret').value.trim();
-    const proxy = document.getElementById('dhanProxy').value.trim() || 'http://localhost:8787';
+    const proxy = document.getElementById('dhanProxy').value.trim() || 'https://optionpulse-xc50.onrender.com';
 
     if (!clientId || !pin || !secret) {
       alert('Please fill out Client ID, Login PIN, and TOTP Secret Key in the connection settings first.');
